@@ -10,7 +10,7 @@ macaroon = stream.read()
 
 json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macaroon+'"}'
 
-fd = open("tallycoin_api.key","w")
+fd = open("tallycoin.key","w")
 fd.write(json)
 
 print("\n")
