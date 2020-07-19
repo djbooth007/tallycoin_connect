@@ -22,6 +22,6 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 ## User input API key and save to file
 
-`python3 tallytunnel.py`
+`python3 setup.py`
 
 ##
