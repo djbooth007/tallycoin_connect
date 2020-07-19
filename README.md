@@ -1,7 +1,7 @@
 # tallytunnel
 Install on home bitcoin node for retrieval of payment information by Tallycoin
 
-## Websocket dependancy
+## NodeJS Websocket dependancy
 
-`sudo npm install -g wscat`
+`sudo npm install -g ws`
 
