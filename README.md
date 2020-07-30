@@ -4,7 +4,9 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 ## Install Tallycoin Connect
 
-`git clone etc`
+`cd /home/admin/`
+
+`git clone https://github.com/djbooth007/tallycoin_connect`
 
 ## Enter directory
 
@@ -12,13 +14,13 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 ## Install Websocket
 
-`sudo npm install -g ws`
+`sudo npm install ws`
 
 ## Install LN-Service
 
-`npm install ln-service'
+`sudo npm install ln-service'
 
-[see: https://github.com/alexbosworth/ln-service ]
+[for more info: https://github.com/alexbosworth/ln-service ]
 
 ## User input API key and save to file
 
