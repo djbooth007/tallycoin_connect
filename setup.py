@@ -1,17 +1,15 @@
 import os
+import socket
 
-key = input("Enter Tallycoin API Key: ")
-
-stream = os.popen("base64 ~/.lnd/tls.cert | tr -d '\n'")
+stream = os.popen("base64 /home/bitcoin/.lnd/tls.cert | tr -d '\n'")
 cert = stream.read()
 
-stream = os.popen("base64 ~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon | tr -d '\n'")
+stream = os.popen("base64 /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon | tr -d '\n'")
 macaroon = stream.read()
 
-json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macaroon+'"}'
+json =  '{ "tallycoin_api":"", "tls_cert":"'+cert+'", "macaroon":"'+macaroon+'"}'
 
-fd = open("tallycoin.key","w")
+fd = open("tallycoin_api.key","w")
 fd.write(json)
 
-print("\n")
-print("Done")
+print("Enter your API key at http://"+socket.gethostbyname(socket.gethostname())+":8123/" )
