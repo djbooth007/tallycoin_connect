@@ -16,9 +16,9 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 ## Install LN-Service
 
-`sudo npm install ln-service'
+`sudo npm install ln-service`
 
-[for more info: https://github.com/alexbosworth/ln-service ]
+[ For more info: https://github.com/alexbosworth/ln-service ]
 
 ## User input API key and save to file
 
