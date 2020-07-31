@@ -10,7 +10,7 @@
 		xhr_api.onload = function() { 
 			if(this.response !== null){ json = this.response; check_key(); }
 		} 	
-		xhr_api.open( 'GET', 'tallycoin.key' );
+		xhr_api.open( 'GET', 'tallycoin_api.key' );
 		xhr_api.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr_api.responseType = 'json';
 		xhr_api.send();	
@@ -20,7 +20,7 @@
 		if(json.tallycoin_api != ""){
 			document.getElementById('api_key').value = json.tallycoin_api;
 		}
-		if(json.tls_cert == "" || json.macaroon == ""){ lnd_setup_error(); }
+		if(json.tls_cert == "" || json.macaroon == "" || json.tls_cert === undefined || json.macaroon === undefined){ lnd_setup_error(); }
 	}
 	
 	function submit_api(){
