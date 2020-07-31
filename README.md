@@ -8,8 +8,6 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 `git clone https://github.com/djbooth007/tallycoin_connect`
 
-## Enter directory
-
 `cd tallycoin_connect`
 
 ## Install Websocket
