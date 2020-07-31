@@ -2,7 +2,7 @@
 
 Install on home bitcoin node for retrieval of payment information by Tallycoin. LND required.
 
-## Install Tallycoin Connect
+## Download Tallycoin Connect
 
 `cd /home/admin/`
 
@@ -20,7 +20,7 @@ Install on home bitcoin node for retrieval of payment information by Tallycoin. 
 
 [ For more info: https://github.com/alexbosworth/ln-service ]
 
-## User input API key and save to file
+## Install Tallycoin Connect
 
 `sudo python3 setup.py`
 
