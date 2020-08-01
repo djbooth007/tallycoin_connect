@@ -11,89 +11,139 @@ const app = express();
 const fs = require("fs");
 const WebSocket = require('ws');
 const lnService = require('ln-service');
+const server = require('http').createServer();
 
-// setup
+var ws; var wstimer;
 
-const ws = new WebSocket('ws://10.0.0.7:8080/'); 
-let server = require('http').createServer();
+// Create a server to display a setup page
+
 app.use(express.static(__dirname));
 app.get('/', function(req, res){ res.sendFile(__dirname + '/setup.html'); });
 server.on('request', app);
 
-// read credentials before continuing
-
-fs.readFile('tallycoin_api.key', 'utf8', function(err, contents) {
-    keys = JSON.parse(contents);
-    start_websocket(); // start connection to Tallycoin
-});
-
-// Write to config file when called
+// Write to key file when saved from setup page
 
 app.post('/save', jsonParser, function(request, response){
-	
-	fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
-	  if (err) console.log(err);
-	  console.log("Written to Key File.");
-	});
-	
+
+        fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
+          if (err) console.log(err);
+          console.log("Written to Key File.");
+        });
+
 });
 
-function lightning(type, data){
 
-	const {lnd} = lnService.authenticatedLndGrpc({
-		cert: keys['tls_cert'],
-		macaroon: keys['macaroon'],
-		socket: '127.0.0.1:10009',
+// reload API key every 30 seconds in case of update
+
+credentials(); setInterval(function(){ credentials(); }, 30000); 
+
+// start connection to Tallycoin server
+
+start_websocket(); 
+
+// Start on port 8123
+
+server.listen(8123, function() { console.log('Ready.'); });
+
+// FUNCTION: Read key file
+
+function credentials(){
+	fs.readFile('tallycoin_api.key', 'utf8', function(err, contents) {
+		keys = JSON.parse(contents);
 	});
-
-	if(type == 'payment_create'){
-
-		lnService.createInvoice({lnd, description: data.description, tokens: data.amount}, (err, invoice) => {
-			var invoice_id = invoice['id'];
-			var request = invoice['request'];
-			var unique_id = data.unique_id;
-
-			ws.send(JSON.stringify({ "type": "payment_data", "id": invoice_id, "payment_request": request, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
-		});
-
-	}
-
-	if(type == 'payment_verify'){
-
-		lnService.getInvoice({lnd, id: data.inv_id}, (err, invoice) => {
-			var received = parseInt(invoice['received']); // amount received in satoshis
-			var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
-			var unique_id = data.unique_id;
-
-			if(received >= tokens){ var status = 'paid'; }else{ var status = 'unpaid'; }
-
-			ws.send(JSON.stringify({ "type": "payment_verify", "id": invoice['id'], "status": status, "amount": tokens, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
-		});
-	}
-
 }
 
+// FUNCTION: Websocket connection
+
 function start_websocket(){
-	wstimer = setInterval(function(){ 
-		if(ws.readyState == 1){ 
-				ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
-		}
-	}, 20000);
+	console.log('starting websocket');
 
+	clearInterval(wstimer);
+	ws = new WebSocket('ws://10.0.0.7:8080/'); 
+	var restarting;
+
+	// send setup message and API key every 20 seconds to keep a live connection
+	
 	ws.on('open', function open() {
-	  ws.send(JSON.stringify({ "setup": keys['tallycoin_api'] }));
-	});
+		restarting = 'N';
 
-	ws.on('close', function close() {
-	  clearInterval(wstimer);
-	});
+		ws.send(JSON.stringify({ "setup": keys['tallycoin_api'] }));
 
+		wstimer = setInterval(function(){ 
+			if(ws.readyState == 1){ 
+				ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
+			}
+		}, 20000);
+
+	});
+	
+	// Parse incoming message
+	
 	ws.on('message', function incoming(data) {
 		var msg = JSON.parse(data);
 		lightning(msg.type,msg);
 		console.log(msg);
 	});
+	
+	// Error handling. Try reconnect every 10 seconds.
 
+	ws.on('close', function close(e) {
+		clearInterval(wstimer);
+		if(restarting != 'Y'){  
+			restarting = 'Y';
+			console.log('close websocket'); 
+			setTimeout(function(){ start_websocket(); }, 10000);
+		}
+	});
+
+	ws.on('error', function error(e) {
+		clearInterval(wstimer);
+		if(restarting != 'Y'){ 
+			restarting = 'Y'; 
+			setTimeout(function(){ start_websocket(); }, 10000);
+		}
+	});
 }
 
-server.listen(8123, function() { console.log('Ready.'); });
+// FUNCTION: Parse incoming messages and reply to Tallycoin server
+
+function lightning(type, data){
+
+	// credentials for LND.
+	
+	const {lnd} = lnService.authenticatedLndGrpc({
+			cert: keys['tls_cert'],
+			macaroon: keys['macaroon'],
+			socket: '127.0.0.1:10009',
+	});
+
+	// When message 'payment_create' received, get fresh invoice from LND and send response to Tallycoin server
+	
+	if(type == 'payment_create'){
+
+		lnService.createInvoice({lnd, description: data.description, tokens: data.amount}, (err, invoice) => {
+				var invoice_id = invoice['id'];
+				var request = invoice['request'];
+				var unique_id = data.unique_id;
+
+				ws.send(JSON.stringify({ "type": "payment_data", "id": invoice_id, "payment_request": request, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
+		});
+
+	}
+
+	// When message 'payment_verify' received, check payment status of specific invoice with LND and send response to Tallycoin server
+	
+	if(type == 'payment_verify'){
+
+		lnService.getInvoice({lnd, id: data.inv_id}, (err, invoice) => {
+				var received = parseInt(invoice['received']); // amount received in satoshis
+				var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
+				var unique_id = data.unique_id;
+
+				if(received >= tokens){ var status = 'paid'; }else{ var status = 'unpaid'; }
+
+				ws.send(JSON.stringify({ "type": "payment_verify", "id": invoice['id'], "status": status, "amount": tokens, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
+		});
+	}
+
+}
