@@ -2,7 +2,7 @@
 
 **Decentralize the money.** 
 
-Install Tallycoin Connect on a bitcoin node to allow for the retrieval of lightning invoices via [Tallycoin](https://tallycoin.app). LND required.
+Install Tallycoin Connect on a bitcoin node to allow for the retrieval of lightning invoices via [Tallycoin](https://tallyco.in). LND required.
 
 ## Download Tallycoin Connect
 
