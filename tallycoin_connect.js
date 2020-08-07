@@ -121,7 +121,7 @@ function lightning(type, data){
 	
 	if(type == 'payment_create'){
 
-		lnService.createInvoice({lnd, description: data.description, tokens: data.amount}, (err, invoice) => {
+                lnService.createInvoice({lnd, is_including_private_channels: true, description: data.description, tokens: data.amount}, (err, invoice) => {
 				var invoice_id = invoice['id'];
 				var request = invoice['request'];
 				var unique_id = data.unique_id;
