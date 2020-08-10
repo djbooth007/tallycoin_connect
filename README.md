@@ -1,4 +1,4 @@
-# Tallycoin Connect
+# Tallycoin Connect (BETA)
 
 **Decentralize the money.** 
 
