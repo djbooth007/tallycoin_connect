@@ -15,20 +15,37 @@ const server = require('http').createServer();
 
 var ws; var wstimer;
 
-// Create a server to display a setup page
+// Create a server for transaction and setup pages
 
 app.use(express.static(__dirname));
-app.get('/', function(req, res){ res.sendFile(__dirname + '/setup.html'); });
+app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
 server.on('request', app);
 
 // Write to key file when saved from setup page
 
 app.post('/save', jsonParser, function(request, response){
 
-        fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
-          if (err) console.log(err);
-          console.log("Written to Key File.");
-        });
+	fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
+	  if (err) console.log(err);
+	  console.log("Written to Key File.");
+	});
+
+});
+
+// Retrieve invoice list
+
+
+app.post('/list', jsonParser, function(request, response){
+
+	var {lnd} = lnService.authenticatedLndGrpc({
+		cert: keys['tls_cert'],
+		macaroon: keys['macaroon'],
+		socket: '127.0.0.1:10009',
+	});
+	
+	lnService.getInvoices({lnd}, (err, invoices) => {
+			response.json(invoices);
+	});
 
 });
 
@@ -63,7 +80,7 @@ function start_websocket(){
 	var restarting;
 
 	// send setup message and API key every 20 seconds to keep a live connection
-	
+
 	ws.on('open', function open() {
 		restarting = 'N';
 
@@ -71,20 +88,19 @@ function start_websocket(){
 
 		wstimer = setInterval(function(){ 
 			if(ws.readyState == 1){ 
-				ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
+					ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
 			}
 		}, 20000);
 
 	});
-	
+
 	// Parse incoming message
-	
+
 	ws.on('message', function incoming(data) {
 		var msg = JSON.parse(data);
 		lightning(msg.type,msg);
-		console.log(msg);
 	});
-	
+
 	// Error handling. Try reconnect every 10 seconds.
 
 	ws.on('close', function close(e) {
@@ -110,40 +126,40 @@ function start_websocket(){
 function lightning(type, data){
 
 	// credentials for LND.
-	
-	const {lnd} = lnService.authenticatedLndGrpc({
-			cert: keys['tls_cert'],
-			macaroon: keys['macaroon'],
-			socket: '127.0.0.1:10009',
+
+	var {lnd} = lnService.authenticatedLndGrpc({
+		cert: keys['tls_cert'],
+		macaroon: keys['macaroon'],
+		socket: '127.0.0.1:10009',
 	});
 
 	// When message 'payment_create' received, get fresh invoice from LND and send response to Tallycoin server
-	
+
 	if(type == 'payment_create'){
 
-                lnService.createInvoice({lnd, is_including_private_channels: true, description: data.description, tokens: data.amount}, (err, invoice) => {
-				var invoice_id = invoice['id'];
-				var request = invoice['request'];
-				var unique_id = data.unique_id;
+		lnService.createInvoice({lnd, is_including_private_channels: true, description: data.description, tokens: data.amount}, (err, invoice) => {
+			var invoice_id = invoice['id'];
+			var request = invoice['request'];
+			var unique_id = data.unique_id;
 
-				ws.send(JSON.stringify({ "type": "payment_data", "id": invoice_id, "payment_request": request, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
+			ws.send(JSON.stringify({ "type": "payment_data", "id": invoice_id, "payment_request": request, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
 		});
 
 	}
 
 	// When message 'payment_verify' received, check payment status of specific invoice with LND and send response to Tallycoin server
-	
+
 	if(type == 'payment_verify'){
 
 		lnService.getInvoice({lnd, id: data.inv_id}, (err, invoice) => {
-				var received = parseInt(invoice['received']); // amount received in satoshis
-				var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
-				var unique_id = data.unique_id;
+			var received = parseInt(invoice['received']); // amount received in satoshis
+			var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
+			var unique_id = data.unique_id;
 
-				if(received >= tokens){ var status = 'paid'; }else{ var status = 'unpaid'; }
+			if(received >= tokens){ var status = 'paid'; }else{ var status = 'unpaid'; }
 
-				ws.send(JSON.stringify({ "type": "payment_verify", "id": invoice['id'], "status": status, "amount": tokens, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
-		});
+			ws.send(JSON.stringify({ "type": "payment_verify", "id": invoice['id'], "status": status, "amount": tokens, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
+	});
 	}
 
 }
