@@ -1,0 +1,96 @@
+body{ font-size:2rem; color:white; font-family:Arial; border:0; margin:0; background: #0e0e11; }
+.fullwidth{ width:100%; text-align:center; }
+.topshelf{ padding:20px; color:white; background: #573e92; margin-bottom:40px; text-align:center; margin-left: auto; margin-right: auto;}
+input{ padding:0 10px 0 10px; width: 400px; height:50px; font-size:1.5rem; display:inline-block; border:2px solid #cccccc; border-radius:5px; }
+.btn{ padding: 10px; font-size:1.5rem; color:white; display:inline-block; background: #573e92; border-radius:5px; cursor:pointer; }
+.text{ display:block; margin:20px 0 20px 0; }
+.whitefont{ color:white; }
+.greyfont{ color: #808080; }
+.smtext{ font-size: 1.2rem; margin-top:50px; line-height:2rem; }
+a{ color: #fdc948; }
+#error{ display:none; margin-top:50px; color:#bb0000; border:2px solid #bb0000; font-weight:700; }
+#saved{ color:green; font-weight:700; display:none; margin-left:10px; }
+#setup{ display:none; }
+.dot{ display: inline-flex; width: 1.2rem; height: 1.2rem; border-radius: 1.2rem; margin: .4rem 1rem 0 0; background-color: #fdc948; }
+
+#invoice-table {max-width: 1200px;	margin-left: auto;	margin-right: auto;}
+table {  width: 100%;}
+th, td {  font-weight: unset;  padding-left: 10px; }
+.column1 {  width: 10%;  text-align:center; }
+.column2 {  width: 25%; }
+.column3 {  width: 15%; }
+.column4 {  width: 50%; }
+.table100-head th {  padding-top: 18px;  padding-bottom: 18px; }
+.table100-body td {  padding-top: 16px;  padding-bottom: 16px; }
+.table100 {  position: relative;  padding-top: 60px; }
+.table100-head {  position: absolute;  width: 100%;  top: 0;  left: 0; }
+.table100-body {  max-height: 585px;  overflow: auto; }
+.table100.ver3 th {  font-family: Arial;  font-size:1.2rem; color: #ffffff;  line-height: 1.4;  text-transform: uppercase;  background-color: #393939; }
+.table100.ver3 td {  font-family: Arial;  font-size:1.3rem; line-height: 1.4;  background-color: #222222; }
+.table100.ver3 {  border-radius: 10px;  overflow: hidden;  background-color: #333;  right: 5px; }
+#tx_count{ font-size:1rem; font-weight: 500; text-align:left; margin-top:20px; }
+
+/* RADIO BUTTONS */
+
+.radiolabel {
+  display: inline-block;
+  position: relative;
+  padding: 0 40px 0 40px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.radiolabel input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.radiobtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.radiolabel:hover input ~ .radiobtn {
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.radiolabel input:checked ~ .radiobtn {
+  background-color: #573e92;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.radiobtn:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.radiolabel input:checked ~ .radiobtn:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.radiolabel .radiobtn:after {
+	top: 8px;
+	left: 8px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: white;
+}

@@ -1,0 +1,108 @@
+<html>
+<head>
+	<meta charset="utf-8" /> 
+	<title>Tallycoin Connect</title>
+	<link rel="icon" type="image/png" href="assets/favicon.png">
+	<link href="assets/connect.css" rel="stylesheet">
+	<script src="assets/connect.js"></script>
+	<script>
+	
+	// Load components when ready
+
+	var preloaded_assets = 0; var connect;
+
+	setup_timer = setInterval(function(){ 		
+		if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }	
+		if(preloaded_assets == 1 && document.readyState === 'complete'){ 
+			clearInterval(setup_timer);	
+			connect.init();
+		}
+	},50);	
+			
+	</script>
+		
+</head>
+
+<body>
+
+	<div class="fullwidth">
+		<div class="topshelf">
+			<div style="max-width:1200px;margin-left: auto; margin-right: auto;">
+				<div style="float:left;">tallycoin connect</div>
+				<div style="float:right;cursor:pointer;margin-left:50px;" onclick="connect.open_setup()">Setup</div>
+				<div style="float:right;cursor:pointer;" onclick="connect.open_invoices()">Transactions</div>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+
+		<div id="setup">
+			<div class="text">Your API Key</div>
+			
+			<input type="text" id="api_key"> <div class="btn" onclick="connect.submit_api()">Save</div>
+			<div id="saved">&#x2714; DONE</div>
+			
+			<div class="smtext" id="error">
+				There was a problem during setup.<br/>
+				Make sure Tallycoin Connect has been installed correctly. <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a></div>
+			
+			<div class="text smtext">Don't have your Tallycoin API key?<br/><a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect</div>
+
+		</div>
+
+		<div id="invoice-table">
+		
+			<div style="display:block;">
+
+				<label class="radiolabel">All
+				  <input value="all" type="radio" name="inv_status" id="inv_status_all" onclick="connect.change_status('all')">
+				  <span class="radiobtn"></span>
+				</label>
+
+				<label class="radiolabel">Paid
+				  <input value="paid" type="radio" id="inv_status_paid" name="inv_status" onclick="connect.change_status('paid')">
+				  <span class="radiobtn"></span>
+				</label>
+
+				<label class="radiolabel">Not Paid
+				  <input value="unpaid" type="radio" id="inv_status_unpaid" name="inv_status" onclick="connect.change_status('unpaid')">
+				  <span class="radiobtn"></span>
+				</label>
+				
+			</div>
+
+			<div class="table100 ver3 m-b-110">
+				<div class="table100-head">
+					<table>
+						<thead>
+							<tr class="row100 head">
+								<th class="cell100 column1">Status</th>
+								<th class="cell100 column2">Date</th>
+								<th class="cell100 column3">Sats</th>
+								<th class="cell100 column4">Description</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+
+				<div class="table100-body">
+					<table>
+						<tbody id="invoice_list">
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
+	
+		</div>
+		
+	
+	</div>
+
+	<audio id="sfx" >
+	  <source src="assets/incoming_tx.ogg" type="audio/ogg">
+	  <source src="assets/incoming_tx.mp3" type="audio/mpeg">
+	</audio> 
+
+</body>
+</html>
