@@ -12,9 +12,9 @@ Restart=always
 
 KillSignal=SIGQUIT
 
-WorkingDirectory=/home/admin/tallycoin_connect
+WorkingDirectory={{working_directory}}
 
-ExecStart=/usr/bin/node /home/admin/tallycoin_connect/tallycoin_connect.js
+ExecStart=/usr/bin/node {{working_directory}}/tallycoin_connect.js
 
 [Install]
 
