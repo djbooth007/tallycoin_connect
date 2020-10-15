@@ -3,6 +3,17 @@ from os import path
 import socket
 import json
 
+# modify default service file
+
+service = os.popen("cat tallycoin_connect.service").read();
+path = os.getcwd()
+new_service = service.replace("{{working_directory}}", path);
+
+# save service file
+
+fd = open("tallycoin_connect.service","w");
+fd.write(new_service);
+
 # setup always-on service
 
 os.popen("cp tallycoin_connect.service /etc/systemd/system/").read();
