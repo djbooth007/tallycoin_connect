@@ -1,6 +1,6 @@
 # Tallycoin Connect (BETA)
 
-![screenshot](https://tallyco.in/img/tallycoin_connect_screenshot.png)
+![screenshot](https://tallyco.in/img/tallycoin_connect_screenshot2.png)
 
 **Decentralize the money.** 
 
