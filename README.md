@@ -1,4 +1,4 @@
-# Tallycoin Connect (BETA)
+# Tallycoin Connect
 
 ![screenshot](https://tallyco.in/img/tallycoin_connect_screenshot2.png)
 
