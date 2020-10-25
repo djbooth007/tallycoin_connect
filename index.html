@@ -28,9 +28,9 @@
 	<div class="fullwidth">
 		<div class="topshelf">
 			<div style="max-width:1200px;margin-left: auto; margin-right: auto;">
-				<div style="float:left;">tallycoin connect</div>
-				<div style="float:right;cursor:pointer;margin-left:50px;" onclick="connect.open_setup()">Setup</div>
-				<div style="float:right;cursor:pointer;" onclick="connect.open_invoices()">Transactions</div>
+				<div style="float:left;"><img src="assets/tallycoin-icon-color.png"> <span style="position:relative; top:-15px; left:5px;">tallycoin CONNECT</span></div>
+				<div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()">Setup</div>
+				<div class="navitem" onclick="connect.open_invoices()">Transactions</div>
 				<div style="clear:both"></div>
 			</div>
 		</div>
@@ -52,6 +52,8 @@
 		<div id="invoice-table">
 		
 			<div style="display:block;">
+			
+				<div class="paid_sats"><span id="paid_sats_total"></span> sats</div>
 
 				<label class="radiolabel">All
 				  <input value="all" type="radio" name="inv_status" id="inv_status_all" onclick="connect.change_status('all')">
@@ -75,10 +77,10 @@
 					<table>
 						<thead>
 							<tr class="row100 head">
-								<th class="cell100 column1">Status</th>
-								<th class="cell100 column2">Date</th>
-								<th class="cell100 column3">Sats</th>
-								<th class="cell100 column4">Description</th>
+								<th class="column1">Status</th>
+								<th class="column2">Date</th>
+								<th class="column3">Sats</th>
+								<th class="column4">Description</th>
 							</tr>
 						</thead>
 					</table>
@@ -86,14 +88,13 @@
 
 				<div class="table100-body">
 					<table>
-						<tbody id="invoice_list">
-						</tbody>
+						<tbody id="invoice_list"></tbody>
 					</table>
 				</div>
 			</div>
 			
 			<div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
-	
+			
 		</div>
 		
 	
