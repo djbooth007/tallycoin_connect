@@ -36,7 +36,7 @@ var connect = function(){
 	
 	this.insert_list = function(list){
 		
-		all_count = 0; paid_count = 0; unpaid_count = 0;
+		all_count = 0; paid_count = 0; unpaid_count = 0; paid_sats_total = 0;
 		document.getElementById('invoice_list').innerHTML = '';
 		
 		Object.values(list).forEach(invoice => {
@@ -49,7 +49,7 @@ var connect = function(){
 				var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
 				if(received >= tokens){ 
 					var status = 'paid'; var dotbg = 'green;'; var fc = ' whitefont'; 	
-					paid_count++;					
+					paid_count++;	paid_sats_total += received;			
 				}else{ 
 					var status = 'unpaid'; var dotbg = '#fdc948;'; var fc = ' greyfont';
 					unpaid_count++;					
@@ -58,47 +58,66 @@ var connect = function(){
 				
 				// notify new paid transaction
 				if(paid_count == 1 && last_id != invoice['id'] && last_id != '' && status == 'paid'){ last_id = invoice['id']; connect.new_transaction_received(); }				
-							
-				// create table row
-				var tr = document.createElement("tr");
-				tr.dataset.status = status;
-				tr.dataset.inv_id = invoice['id'];
+
+				// insert into table
+				if(status == 'paid'){ var amount = received.toString(); }else{ var amount = tokens.toString(); }								
 				if(paid_count == 1 && last_id == ''){ last_id = invoice['id']; }
 				
-				// cell 1
-				var td = document.createElement("td");
-				td.classList = 'column1';
-				td.innerHTML = '<span class="dot" style="background-color:'+dotbg+'"></span>';
-				tr.appendChild(td);
-
-				// cell 2
-				var td = document.createElement("td");
-				td.classList = 'column2'+fc;
-				var t = document.createTextNode(connect.format_date(invoice['created_at']));
-				td.appendChild(t);
-				tr.appendChild(td);
-				
-				// cell 3
-				if(status == 'paid'){ var amount = received.toString(); }else{ var amount = tokens.toString(); }
-				var td = document.createElement("td");
-				td.classList = 'column3'+fc;
-				var t = document.createTextNode(connect.format_number(amount));
-				td.appendChild(t);
-				tr.appendChild(td);
-				
-				// cell 4
-				var td = document.createElement("td");
-				td.classList = 'column4'+fc;
-				var t = document.createTextNode(description);
-				td.appendChild(t);
-				tr.appendChild(td);
-				
-				// add to table
-				document.getElementById('invoice_list').append(tr);
+				connect.insert_table_row(status,invoice['id'],dotbg,fc,invoice['created_at'],amount,description);
 			}
 		});
 
+		connect.insert_table_row('','','','','','','');
+		
+		document.getElementById('paid_sats_total').innerHTML = connect.format_number(paid_sats_total);
+		
 		connect.change_status(localStorage.getItem("tcc_status_pref"));	
+	}
+	
+	this.insert_table_row = function(status,invoice_id,dotbg,fc,created_at,amount,description){
+		
+		// create table row
+		var tr = document.createElement("tr");
+		tr.dataset.status = status;
+		tr.dataset.inv_id = invoice_id;
+		
+		// cell 1
+		var td = document.createElement("td");
+		td.classList = 'column1';
+		if(dotbg != ''){ td.innerHTML = '<span class="dot" style="background-color:'+dotbg+'"></span>'; }
+		tr.appendChild(td);
+
+		// cell 2
+		var td = document.createElement("td");		
+		td.classList = 'column2'+fc;
+		if(created_at != ''){
+			var t = document.createTextNode(connect.format_date(created_at));
+			td.appendChild(t);
+		}
+		tr.appendChild(td);
+		
+		// cell 3
+		var td = document.createElement("td");
+		td.classList = 'column3'+fc;
+		if(amount != ''){
+			var t = document.createTextNode(connect.format_number(amount));
+			td.appendChild(t);
+		}
+		tr.appendChild(td);
+		
+		// cell 4
+		var td = document.createElement("td");
+		td.classList = 'column4'+fc;
+		if(description == ''){ 
+			td.innerHTML = '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'; 
+		}else{
+			var t = document.createTextNode(description);
+			td.appendChild(t);
+		}
+		tr.appendChild(td);
+		
+		// add to table
+		document.getElementById('invoice_list').append(tr);		
 	}
 	
 	this.update_tx_count = function(){
