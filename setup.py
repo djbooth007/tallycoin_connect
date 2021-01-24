@@ -6,8 +6,8 @@ import json
 # modify default service file
 
 service = os.popen("cat tallycoin_connect.service").read();
-path = os.getcwd()
-new_service = service.replace("{{working_directory}}", path);
+cwd = os.getcwd()
+new_service = service.replace("{{working_directory}}", cwd);
 
 # save service file
 
