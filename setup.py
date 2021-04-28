@@ -16,11 +16,11 @@ fd.write(new_service);
 
 # setup always-on service
 
-os.popen("cp tallycoin_connect.service /etc/systemd/system/").read();
-os.popen("systemctl daemon-reload").read();
+os.popen("sudo cp tallycoin_connect.service /etc/systemd/system/").read();
+os.popen("sudo systemctl daemon-reload").read();
 
-os.popen("systemctl enable tallycoin_connect.service").read();
-os.popen("systemctl start tallycoin_connect.service").read(); 
+os.popen("sudo systemctl enable tallycoin_connect.service").read();
+os.popen("sudo systemctl start tallycoin_connect.service").read(); 
 
 # get LND keys and save to file
 
