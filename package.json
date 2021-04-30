@@ -1,0 +1,9 @@
+{
+  "name": "tallycoin_connect",
+  "version": "1.0.0",
+  "description": "Tallycoin Connect service for tallycoin.app",
+  "dependencies": {
+	  "ws": "*",
+	  "ln-service": "*"
+	}
+}
