@@ -1,5 +1,6 @@
 import os
 from os import path
+import subprocess
 import socket
 import json
 
@@ -11,16 +12,17 @@ new_service = service.replace("{{working_directory}}", cwd);
 
 # save service file
 
-fd = open("tallycoin_connect.service","w");
+fd = open("/etc/systemd/system/tallycoin_connect.service", "w");
+fd.write(new_service);
+
+fd = open("/lib/systemd/system/tallycoin_connect.service", "w");
 fd.write(new_service);
 
 # setup always-on service
 
-os.popen("sudo cp tallycoin_connect.service /etc/systemd/system/").read();
-os.popen("sudo systemctl daemon-reload").read();
-
-os.popen("sudo systemctl enable tallycoin_connect.service").read();
-os.popen("sudo systemctl start tallycoin_connect.service").read(); 
+subprocess.run(["sudo", "systemctl", "daemon-reload"]);
+subprocess.run(["sudo", "systemctl", "enable", "tallycoin_connect"]);
+subprocess.run(["sudo", "systemctl", "start", "tallycoin_connect"]); 
 
 # get LND keys and save to file
 
@@ -44,6 +46,6 @@ json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macar
 
 fd = open("tallycoin_api.key","w");
 fd.write(json);
-os.chmod("sudo tallycoin_api.key", 0o777);
+subprocess.run(["sudo", "chmod", "0777", "tallycoin_api.key"]);
 
 print("Enter your API key at http://"+socket.gethostbyname(socket.gethostname())+":8123/" );
