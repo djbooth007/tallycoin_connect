@@ -44,6 +44,6 @@ json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macar
 
 fd = open("tallycoin_api.key","w");
 fd.write(json);
-os.chmod("tallycoin_api.key", 0o777);
+os.chmod("sudo tallycoin_api.key", 0o777);
 
 print("Enter your API key at http://"+socket.gethostbyname(socket.gethostname())+":8123/" );
