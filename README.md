@@ -20,6 +20,18 @@ npm install
 python3 setup.py
 ```
 
+## Docker
+
+Alternatively, you can run the app as a Docker container:
+
+```sh
+# Build the image
+docker build -t tallycoin_connect .
+
+# Start the container
+docker run -ti -p 8123:8123 tallycoin_connect
+```
+
 ## Enter API Key
 
 Visit http://localhost:8123/ (replace 'localhost' with your actual hostname)
