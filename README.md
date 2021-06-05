@@ -32,6 +32,12 @@ docker build -t tallycoin_connect .
 docker run -ti -p 8123:8123 tallycoin_connect
 ```
 
+You can pass the credentials and file paths using these environment variables:
+
+- `TALLYCOIN_APIKEY`
+- `LND_TLSCERT_PATH`
+- `LND_MACAROON_PATH`
+
 ## Enter API Key
 
 Visit http://localhost:8123/ (replace 'localhost' with your actual hostname)

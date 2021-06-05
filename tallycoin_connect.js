@@ -50,9 +50,22 @@ app.post('/list', jsonParser, function(request, response){
 });
 
 
-// reload API key every 30 seconds in case of update
 
-credentials(); setInterval(function(){ credentials(); }, 30000); 
+// Retrieve credentials via environment or from key file
+let keys;
+const { TALLYCOIN_APIKEY, LND_TLSCERT_PATH, LND_MACAROON_PATH } = process.env;
+
+if (TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH) {
+  keys = {
+    tallycoin_api: TALLYCOIN_APIKEY,
+    tls_cert: base64FromFile(LND_TLSCERT_PATH),
+    macaroon: base64FromFile(LND_MACAROON_PATH)
+  }
+} else {
+  // reload API key every 30 seconds in case of update
+  credentials();
+  setInterval(credentials, 30000);
+}
 
 // start connection to Tallycoin server
 
@@ -68,6 +81,11 @@ function credentials(){
 	fs.readFile('tallycoin_api.key', 'utf8', function(err, contents) {
 		keys = JSON.parse(contents);
 	});
+}
+
+function base64FromFile(file){
+  const content = fs.readFileSync(file);
+  return Buffer.from(content).toString('base64');
 }
 
 // FUNCTION: Websocket connection
