@@ -21,17 +21,6 @@ app.use(express.static(__dirname));
 app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
 server.on('request', app);
 
-// Write to key file when saved from setup page
-
-app.post('/save', jsonParser, function(request, response){
-
-	fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
-	  if (err) console.log(err);
-	  console.log("Written to Key File.");
-	});
-
-});
-
 // Retrieve invoice list
 
 
@@ -61,10 +50,20 @@ if (TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH) {
     tls_cert: base64FromFile(LND_TLSCERT_PATH),
     macaroon: base64FromFile(LND_MACAROON_PATH)
   }
+
+  fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
 } else {
   // reload API key every 30 seconds in case of update
   credentials();
   setInterval(credentials, 30000);
+
+  // Write to key file when saved from setup page
+  app.post('/save', jsonParser, function (request, response) {
+    fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
+      if (err) console.log(err);
+      console.log("Written to Key File.");
+    });
+  });
 }
 
 // start connection to Tallycoin server
