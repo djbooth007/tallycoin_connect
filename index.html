@@ -1,26 +1,26 @@
 <html>
 <head>
-	<meta charset="utf-8" /> 
+	<meta charset="utf-8" />
 	<title>Tallycoin Connect</title>
 	<link rel="icon" type="image/png" href="assets/favicon.png">
 	<link href="assets/connect.css" rel="stylesheet">
 	<script src="assets/connect.js"></script>
 	<script>
-	
+
 	// Load components when ready
 
 	var preloaded_assets = 0; var connect;
 
-	setup_timer = setInterval(function(){ 		
-		if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }	
-		if(preloaded_assets == 1 && document.readyState === 'complete'){ 
-			clearInterval(setup_timer);	
+	setup_timer = setInterval(function(){
+		if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }
+		if(preloaded_assets == 1 && document.readyState === 'complete'){
+			clearInterval(setup_timer);
 			connect.init();
 		}
-	},50);	
-			
+	},50);
+
 	</script>
-		
+
 </head>
 
 <body>
@@ -29,7 +29,7 @@
 		<div class="topshelf">
 			<div style="max-width:1200px;margin-left: auto; margin-right: auto;">
 				<div style="float:left;"><img src="assets/tallycoin-icon-color.png"> <span style="position:relative; top:-15px; left:5px;">tallycoin CONNECT</span></div>
-				<div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()">Setup</div>
+				<div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()"><span id="sync">&#9679;</span> Setup</div>
 				<div class="navitem" onclick="connect.open_invoices()">Transactions</div>
 				<div style="clear:both"></div>
 			</div>
@@ -37,22 +37,22 @@
 
 		<div id="setup">
 			<div class="text">Your API Key</div>
-			
+
 			<input type="text" id="api_key"> <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save</div>
 			<div id="saved">&#x2714; DONE</div>
-			
+
 			<div class="smtext" id="error">
 				There was a problem during setup.<br/>
 				Make sure Tallycoin Connect has been installed correctly. <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a></div>
-			
+
 			<div class="text smtext">Don't have your Tallycoin API key?<br/><a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect</div>
 
 		</div>
 
 		<div id="invoice-table">
-		
+
 			<div style="display:block;">
-			
+
 				<div class="paid_sats"><span id="paid_sats_total"></span> sats</div>
 
 				<label class="radiolabel">All
@@ -69,7 +69,7 @@
 				  <input value="unpaid" type="radio" id="inv_status_unpaid" name="inv_status" onclick="connect.change_status('unpaid')">
 				  <span class="radiobtn"></span>
 				</label>
-				
+
 			</div>
 
 			<div class="table100 ver3 m-b-110">
@@ -92,18 +92,18 @@
 					</table>
 				</div>
 			</div>
-			
+
 			<div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
-			
+
 		</div>
-		
-	
+
+
 	</div>
 
 	<audio id="sfx" >
 	  <source src="assets/incoming_tx.ogg" type="audio/ogg">
 	  <source src="assets/incoming_tx.mp3" type="audio/mpeg">
-	</audio> 
+	</audio>
 
 </body>
 </html>
