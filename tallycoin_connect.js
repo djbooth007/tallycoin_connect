@@ -13,17 +13,17 @@ const WebSocket = require('ws');
 const lnService = require('ln-service');
 const server = require('http').createServer();
 
-var ws; var wstimer;
+var ws; var wstimer; let keys; var connected = 'N';
 
 // Create a server for transaction and setup pages
 
-app.use(express.static(__dirname));
+app.use('/assets', express.static(__dirname + '/assets'));
+
 app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
+
 server.on('request', app);
 
 // Retrieve invoice list
-
-
 app.post('/list', jsonParser, function(request, response){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
@@ -31,35 +31,44 @@ app.post('/list', jsonParser, function(request, response){
 		macaroon: keys['macaroon'],
 		socket: '127.0.0.1:10009',
 	});
-	
+
 	lnService.getInvoices({lnd}, (err, invoices) => {
 			response.json(invoices);
 	});
 
 });
 
-
+// Confirm sync connection to Tallycoin server
+app.post('/sync', jsonParser, function(request, response){
+	var lnd_status = 'Y';
+	if(keys['macaroon'] == '' || keys['tls_cert'] == '' || keys['tls_cert'] == null || keys['macaroon'] == null){ lnd_status = 'N'; }
+	response.json({ 'sync' : connected, 'api' : keys['tallycoin_api'], 'lnd' : lnd_status });
+});
 
 // Retrieve credentials via environment or from key file
-let keys;
 const { TALLYCOIN_APIKEY, LND_TLSCERT_PATH, LND_MACAROON_PATH } = process.env;
 
-if (TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH) {
-  keys = {
-    tallycoin_api: TALLYCOIN_APIKEY,
-    tls_cert: base64FromFile(LND_TLSCERT_PATH),
-    macaroon: base64FromFile(LND_MACAROON_PATH)
-  }
+if(TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH){
+	keys = {
+		tallycoin_api: TALLYCOIN_APIKEY,
+		tls_cert: base64FromFile(LND_TLSCERT_PATH),
+		macaroon: base64FromFile(LND_MACAROON_PATH)
+	}
 
   fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
+  
 } else {
+	
   // reload API key every 30 seconds in case of update
   credentials();
   setInterval(credentials, 30000);
 
   // Write to key file when saved from setup page
   app.post('/save', jsonParser, function (request, response) {
-    fs.writeFile("tallycoin_api.key", JSON.stringify(request.body), (err) => {
+
+	keys['tallycoin_api'] = request.body.api;
+
+    fs.writeFile("tallycoin_api.key", JSON.stringify(keys), (err) => {
       if (err) console.log(err);
       console.log("Written to Key File.");
     });
@@ -68,7 +77,7 @@ if (TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH) {
 
 // start connection to Tallycoin server
 
-start_websocket(); 
+start_websocket();
 
 // Start on port 8123
 
@@ -93,18 +102,18 @@ function start_websocket(){
 	console.log('starting websocket');
 
 	clearInterval(wstimer);
-	ws = new WebSocket('wss://ws.tallycoin.app:8123/'); 
+	ws = new WebSocket('wss://ws.tallycoin.app:8123/');
 	var restarting;
 
 	// send setup message and API key every 20 seconds to keep a live connection
 
 	ws.on('open', function open() {
-		restarting = 'N';
+		restarting = 'N';  connected = 'Y';
 
 		ws.send(JSON.stringify({ "setup": keys['tallycoin_api'] }));
 
-		wstimer = setInterval(function(){ 
-			if(ws.readyState == 1){ 
+		wstimer = setInterval(function(){
+			if(ws.readyState == 1){
 					ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
 			}
 		}, 20000);
@@ -122,17 +131,19 @@ function start_websocket(){
 
 	ws.on('close', function close(e) {
 		clearInterval(wstimer);
-		if(restarting != 'Y'){  
+		connected = 'N';
+		if(restarting != 'Y'){
 			restarting = 'Y';
-			console.log('close websocket'); 
+			console.log('close websocket');
 			setTimeout(function(){ start_websocket(); }, 10000);
 		}
 	});
 
 	ws.on('error', function error(e) {
 		clearInterval(wstimer);
-		if(restarting != 'Y'){ 
-			restarting = 'Y'; 
+		connected = 'N';
+		if(restarting != 'Y'){
+			restarting = 'Y';
 			setTimeout(function(){ start_websocket(); }, 10000);
 		}
 	});
@@ -176,7 +187,7 @@ function lightning(type, data){
 			if(received >= tokens){ var status = 'paid'; }else{ var status = 'unpaid'; }
 
 			ws.send(JSON.stringify({ "type": "payment_verify", "id": invoice['id'], "status": status, "amount": tokens, "api_key": keys['tallycoin_api'], "unique_id": unique_id }));
-	});
+		});
 	}
 
 }
