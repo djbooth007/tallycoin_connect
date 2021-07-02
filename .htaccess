@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /
+
+# Deny access to tallycoin_api.key
+<Files ~ "\.key$">
+Order allow,deny
+Deny from all
+</Files>
+
+# Disable directory browsing
+Options All -Indexes
