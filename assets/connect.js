@@ -194,6 +194,10 @@ var connect = function(){
 	this.check_key = function(){
 		if(json.tallycoin_api != ""){
 			document.getElementById('api_key').value = json.tallycoin_api;
+			if(json.from_env == true){
+				document.getElementById('api_key').setAttribute('readonly', true);
+				document.getElementById('save_api_key').style.display = 'none';
+			}
 			connect.retrieve_list(); setInterval(function(){ connect.retrieve_list(); }, 30000);
 		}
 		if(json.tls_cert == "" || json.macaroon == "" || json.tls_cert === undefined || json.macaroon === undefined){ connect.lnd_setup_error(); }
