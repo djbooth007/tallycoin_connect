@@ -12,11 +12,11 @@
 	var preloaded_assets = 0; var connect;
 
 	setup_timer = setInterval(function(){
-		if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }
-		if(preloaded_assets == 1 && document.readyState === 'complete'){
-			clearInterval(setup_timer);
-			connect.init();
-		}
+			if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }
+			if(preloaded_assets == 1 && document.readyState === 'complete'){
+					clearInterval(setup_timer);
+					connect.init();
+			}
 	},50);
 
 	</script>
@@ -25,10 +25,10 @@
 
 <body>
 
-	<div class="fullwidth">
+	<div id="fullwidth">
 		<div class="topshelf">
 			<div style="max-width:1200px;margin-left: auto; margin-right: auto;">
-				<div style="float:left;"><img src="assets/tallycoin-icon-color.png"> <span style="position:relative; top:-15px; left:5px;">tallycoin CONNECT</span></div>
+				<div style="float:left;text-align:left;"><img src="assets/tallycoin-connect.png" style="width:60%"></div>
 				<div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()"><span id="sync">&#9679;</span> Setup</div>
 				<div class="navitem" onclick="connect.open_invoices()">Transactions</div>
 				<div style="clear:both"></div>
@@ -36,17 +36,28 @@
 		</div>
 
 		<div id="setup">
-			<div class="text">Your API Key</div>
-
-			<input type="text" id="api_key"> <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save</div>
-			<div id="saved">&#x2714; DONE</div>
 
 			<div class="smtext" id="error">
 				There was a problem during setup.<br/>
-				Make sure Tallycoin Connect has been installed correctly. <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a></div>
+				Make sure Tallycoin Connect has been installed correctly. <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a>
+			</div>
+
+			<div class="text">Your API Key</div>
+
+			<input type="text" id="api_key" onkeyup="connect.check_enter(event, 'api')"> <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save API</div>
+			<div class="saved" id="saved_api">&#x2714; DONE</div>
 
 			<div class="text smtext">Don't have your Tallycoin API key?<br/><a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect</div>
 
+			<hr>
+
+			<div class="text">Restrict Access</div>
+
+			<input type="password" id="passwd" onkeyup="connect.check_enter(event, 'passwd')"> <div id="save_passwd" class="btn" onclick="connect.submit_passwd()">Save Password</div>
+			<div class="saved" id="saved_passwd">&#x2714; DONE</div>
+
+			<div class="text smtext">If Tallycoin Connect is viewable on a public server, restrict access by setting a password.</div>
+			
 		</div>
 
 		<div id="invoice-table">
@@ -96,7 +107,6 @@
 			<div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
 
 		</div>
-
 
 	</div>
 
