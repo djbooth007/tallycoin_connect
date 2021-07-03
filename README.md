@@ -35,6 +35,7 @@ docker run -ti -p 8123:8123 tallycoin_connect
 You can pass the credentials and file paths using these environment variables:
 
 - `TALLYCOIN_APIKEY`
+- `TALLYCOIN_PASSWD`
 - `LND_TLSCERT_PATH`
 - `LND_MACAROON_PATH`
 
