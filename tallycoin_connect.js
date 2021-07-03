@@ -12,18 +12,27 @@ const fs = require("fs");
 const WebSocket = require('ws');
 const lnService = require('ln-service');
 const server = require('http').createServer();
+const shajs = require('sha.js')
 
-var ws; var wstimer; let keys; var connected = 'N';
+var ws; var wstimer; let keys; var connected = 'N'; var users = [];
 
 // Create a server for transaction and setup pages
 
+app.set('trust proxy', true);
+
 app.use('/assets', express.static(__dirname + '/assets'));
 
-app.get('/', function(req, res){ res.sendFile(__dirname + '/index.html'); });
+app.get('/', function(req, res){
+	if(users.includes(req.ip) || keys['tallycoin_passwd'] == '' || keys['tallycoin_passwd'] == null){
+		res.sendFile(__dirname + '/index.html');
+	}else{
+		res.sendFile(__dirname + '/login.html');
+	}
+});
 
 server.on('request', app);
 
-// Retrieve invoice list
+// Retrieve invoice list from LND
 app.post('/list', jsonParser, function(request, response){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
@@ -33,46 +42,62 @@ app.post('/list', jsonParser, function(request, response){
 	});
 
 	lnService.getInvoices({lnd}, (err, invoices) => {
-			response.json(invoices);
+		response.json(invoices);
 	});
 
 });
 
 // Confirm sync connection to Tallycoin server
 app.post('/sync', jsonParser, function(request, response){
-	var lnd_status = 'Y';
+    var lnd_status = 'Y';
 	if(keys['macaroon'] == '' || keys['tls_cert'] == '' || keys['tls_cert'] == null || keys['macaroon'] == null){ lnd_status = 'N'; }
 	response.json({ 'sync' : connected, 'api' : keys['tallycoin_api'], 'lnd' : lnd_status });
 });
 
-// Retrieve credentials via environment or from key file
-const { TALLYCOIN_APIKEY, LND_TLSCERT_PATH, LND_MACAROON_PATH } = process.env;
+// Login when password is set
+app.post('/login', jsonParser, function(request, response){
+	var passwd = passwd_hash(request.body.passwd);
+	if(passwd == keys['tallycoin_passwd']){ 
+		var login_state = 'Y'; 
+		users.push(request.ip);
+	}else{ 
+		var login_state = 'N'; 
+	}
+	response.json({ 'login_state' : login_state });
+});
 
-if(TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH){
+// Save API from setup page
+app.post('/save_api', jsonParser, function (request, response) {
+	keys['tallycoin_api'] = request.body.api;
+	write_key();
+});
+
+// Save password from setup page
+app.post('/save_passwd', jsonParser, function (request, response) {
+	var passwd = passwd_hash(request.body.passwd);
+	keys['tallycoin_passwd'] = passwd;
+	write_key();
+});
+
+
+// Retrieve credentials via environment or from key file
+const { TALLYCOIN_APIKEY, TALLYCOIN_PASSWD, LND_TLSCERT_PATH, LND_MACAROON_PATH } = process.env;
+
+if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH){
 	keys = {
 		tallycoin_api: TALLYCOIN_APIKEY,
+		tallycoin_passwd: TALLYCOIN_PASSWD,
 		tls_cert: base64FromFile(LND_TLSCERT_PATH),
 		macaroon: base64FromFile(LND_MACAROON_PATH)
 	}
 
-  fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
+	fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
   
 } else {
-	
+
   // reload API key every 30 seconds in case of update
   credentials();
   setInterval(credentials, 30000);
-
-  // Write to key file when saved from setup page
-  app.post('/save', jsonParser, function (request, response) {
-
-	keys['tallycoin_api'] = request.body.api;
-
-    fs.writeFile("tallycoin_api.key", JSON.stringify(keys), (err) => {
-      if (err) console.log(err);
-      console.log("Written to Key File.");
-    });
-  });
 }
 
 // start connection to Tallycoin server
@@ -96,6 +121,21 @@ function base64FromFile(file){
   return Buffer.from(content).toString('base64');
 }
 
+// FUNCTION: Write key file
+
+function write_key(){
+    fs.writeFile("tallycoin_api.key", JSON.stringify(keys), (err) => {
+      if (err) console.log(err);
+      console.log("Written to Key File.");
+    });
+}
+
+// FUNCTION: Hash Password
+
+function passwd_hash(text){
+	return shajs('sha256').update(text).digest('hex');
+}
+
 // FUNCTION: Websocket connection
 
 function start_websocket(){
@@ -114,7 +154,7 @@ function start_websocket(){
 
 		wstimer = setInterval(function(){
 			if(ws.readyState == 1){
-					ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
+				ws.send(JSON.stringify({ "ping": keys['tallycoin_api'] }));
 			}
 		}, 20000);
 
