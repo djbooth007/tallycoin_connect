@@ -1,0 +1,10 @@
+.circleci
+.env*
+.git
+.gitignore
+*.md
+!README.md
+node_modules
+setup.py
+tallycoin_api.key
+tallycoin_connect.service
