@@ -39,6 +39,8 @@ You can pass the credentials and file paths using these environment variables:
 - `LND_TLSCERT_PATH`
 - `LND_MACAROON_PATH`
 
+NOTE: `TALLYCOIN_PASSWD` must be a sha256 hash of your login password (optional).
+
 ## Enter API Key
 
 Visit http://localhost:8123/ (replace 'localhost' with your actual hostname)
