@@ -148,7 +148,7 @@ function start_websocket(){
 	console.log('starting websocket');
 
 	clearInterval(wstimer);
-	ws = new WebSocket(`wss://ws.tallycoin.app:${PORT}/`);
+	ws = new WebSocket('wss://ws.tallycoin.app:8123/');
 	var restarting;
 
 	// send setup message and API key every 20 seconds to keep a live connection
