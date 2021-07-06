@@ -49,9 +49,9 @@ app.post('/list', jsonParser, function(request, response){
 
 // Confirm sync connection to Tallycoin server
 app.post('/sync', jsonParser, function(request, response){
-    var lnd_status = 'Y';
+	var lnd_status = 'Y';
 	if(keys['macaroon'] == '' || keys['tls_cert'] == '' || keys['tls_cert'] == null || keys['macaroon'] == null){ lnd_status = 'N'; }
-	response.json({ 'sync' : connected, 'api' : keys['tallycoin_api'], 'lnd' : lnd_status });
+	response.json({ 'sync': connected, 'api': keys['tallycoin_api'], 'lnd': lnd_status, 'from_env': keys['from_env'] });
 });
 
 // Login when password is set
@@ -94,10 +94,11 @@ if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH
 		tallycoin_api: TALLYCOIN_APIKEY,
 		tallycoin_passwd: TALLYCOIN_PASSWD,
 		tls_cert: base64FromFile(LND_TLSCERT_PATH),
-		macaroon: base64FromFile(LND_MACAROON_PATH)
+		macaroon: base64FromFile(LND_MACAROON_PATH),
+		from_env: true
 	}
 
-	fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
+	fs.writeFileSync("tallycoin_api.key", JSON.stringify(keys));
 
 } else {
 
