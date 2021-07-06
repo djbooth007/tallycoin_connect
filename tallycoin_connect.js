@@ -57,11 +57,11 @@ app.post('/sync', jsonParser, function(request, response){
 // Login when password is set
 app.post('/login', jsonParser, function(request, response){
 	var passwd = passwd_hash(request.body.passwd);
-	if(passwd == keys['tallycoin_passwd']){ 
-		var login_state = 'Y'; 
+	if(passwd == keys['tallycoin_passwd']){
+		var login_state = 'Y';
 		users.push(request.ip);
-	}else{ 
-		var login_state = 'N'; 
+	}else{
+		var login_state = 'N';
 	}
 	response.json({ 'login_state' : login_state });
 });
@@ -81,7 +81,13 @@ app.post('/save_passwd', jsonParser, function (request, response) {
 
 
 // Retrieve credentials via environment or from key file
-const { TALLYCOIN_APIKEY, TALLYCOIN_PASSWD, LND_TLSCERT_PATH, LND_MACAROON_PATH } = process.env;
+const {
+  TALLYCOIN_APIKEY,
+  TALLYCOIN_PASSWD,
+  LND_TLSCERT_PATH,
+  LND_MACAROON_PATH,
+  PORT = 8123
+} = process.env;
 
 if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH){
 	keys = {
@@ -92,7 +98,7 @@ if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH
 	}
 
 	fs.writeFileSync("tallycoin_api.key", JSON.stringify({ ...keys, from_env: true }));
-  
+
 } else {
 
   // reload API key every 30 seconds in case of update
@@ -104,9 +110,9 @@ if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH
 
 start_websocket();
 
-// Start on port 8123
+// Start server
 
-server.listen(8123, function() { console.log('Ready.'); });
+server.listen(PORT, function () { console.log(`Running on http://localhost:${PORT}`); });
 
 // FUNCTION: Read key file
 
