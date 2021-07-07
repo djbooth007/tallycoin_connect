@@ -198,11 +198,12 @@ var connect = function(){
 
 	this.check_key = function(json){
 			if(json.api != ""){
-					document.getElementById('api_key').value = json.api;
+  				document.getElementById('api_key').value = document.getElementById('api_key_readonly').textContent = json.api;
 					if(json.from_env == true){ 
-							document.getElementById('api_key').setAttribute('readonly', true);
-							document.getElementById('save_api_key').style.display = 'none';
-					}
+  						document.getElementById('settings-file').style.display = 'none';
+				}else{
+  						document.getElementById('settings-env').style.display = 'none';
+  				}
 					connect.retrieve_list(); setInterval(function(){ connect.retrieve_list(); }, 30000);
 			}
 
