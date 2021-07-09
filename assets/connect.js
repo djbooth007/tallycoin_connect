@@ -178,7 +178,7 @@ var connect = function(){
 
 	this.saved_api = function(){
 			document.getElementById('saved_api').style.display = 'inline-block';
-			setTimeout(function(){ document.getElementById('saved_api').style.display = 'none'; },5000);
+			setTimeout(function(){ location.reload(); },5000);
 	}
 
 	this.saved_passwd = function(){
@@ -212,7 +212,7 @@ var connect = function(){
 
 	this.sync_status = function(json){
 			var color = '#bb0000';
-			if(json.sync == 'Y' && json.lnd == 'Y'){ var color = 'green'; }
+			if(json.sync == 'Y' && json.lnd == 'Y' && json.api != ''){ var color = 'green'; }
 			document.getElementById('sync').style.color = color;
 	}
 
