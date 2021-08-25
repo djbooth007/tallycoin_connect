@@ -35,7 +35,7 @@ app.get('/', function(req, res){
 server.on('request', app);
 
 // Retrieve invoice list from LND
-app.post('/list', jsonParser, function(request, response){
+app.post('/list', jsonParser, function (request, response){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
 		cert: keys['tls_cert'],
@@ -44,7 +44,12 @@ app.post('/list', jsonParser, function(request, response){
 	});
 
 	lnService.getInvoices({lnd}, (err, invoices) => {
-		response.json(invoices);
+    if (err) {
+      const [code, name, { err: { details } }] = err;
+      response.status(code).json({ error: details });
+    } else {
+		  response.json(invoices);
+    }
 	});
 
 });
@@ -93,7 +98,7 @@ const {
 } = process.env;
 
 if(TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH){
-	keys = {
+  keys = {
     lnd_socket: LND_SOCKET,
 		tallycoin_api: TALLYCOIN_APIKEY,
 		tls_cert: base64FromFile(LND_TLSCERT_PATH),
@@ -211,7 +216,7 @@ function lightning(type, data){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
 		cert: keys['tls_cert'],
-		macaroon: keys['macaroon'],
+    macaroon: keys['macaroon'],
     socket: keys['lnd_socket'] || LND_SOCKET_DEFAULT
 	});
 

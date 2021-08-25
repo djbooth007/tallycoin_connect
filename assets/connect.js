@@ -25,10 +25,12 @@ var connect = function(){
 
 			var xhr_list = new XMLHttpRequest();
 			xhr_list.onload = function() {
-					if(this.response !== null && this.response != ''){
-							var list = JSON.parse(this.response);
-							connect.insert_list(list.invoices);
-					}else{ connect.lnd_setup_error(); }
+        const json = JSON.parse(this.response)
+        if (json.error) {
+          connect.lnd_setup_error(json.error);
+        } else {
+          connect.insert_list(json.invoices);
+        }
 			}
 			xhr_list.open('POST', 'list', true);
 			xhr_list.setRequestHeader('Content-Type', 'application/json');
@@ -171,8 +173,9 @@ var connect = function(){
 			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 	}
 
-	this.lnd_setup_error = function(){
+	this.lnd_setup_error = function(errorDetails){
 			document.getElementById('error').style.display = 'block';
+			document.getElementById('errorDetails').innerText = errorDetails;
 			document.getElementById('sync').style.color = '#bb0000';
 	}
 
