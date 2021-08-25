@@ -22,7 +22,7 @@ fd.write(new_service);
 
 subprocess.run(["sudo", "systemctl", "daemon-reload"]);
 subprocess.run(["sudo", "systemctl", "enable", "tallycoin_connect"]);
-subprocess.run(["sudo", "systemctl", "start", "tallycoin_connect"]); 
+subprocess.run(["sudo", "systemctl", "start", "tallycoin_connect"]);
 
 # get LND keys and save to file
 
@@ -37,10 +37,10 @@ if path.exists("tallycoin_api.key"):
   k = stream.read();
   key = json.loads(k);
   key = key['tallycoin_api'];
-else:  
-  key = ''; 
+else:
+  key = '';
 
-json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macaroon+'"}';
+json =  '{ "tallycoin_api":"'+key+'", "tls_cert":"'+cert+'", "macaroon":"'+macaroon+'", "lnd_socket":"127.0.0.1:10009" }';
 
 # write keys
 
