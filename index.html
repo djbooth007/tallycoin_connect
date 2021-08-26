@@ -1,129 +1,120 @@
 <html>
 <head>
-	<meta charset="utf-8" />
-	<title>Tallycoin Connect</title>
-	<link rel="icon" type="image/png" href="assets/favicon.png">
-	<link href="assets/connect.css" rel="stylesheet">
-	<script src="assets/connect.js"></script>
-	<script>
-
-	// Load components when ready
-
-	var preloaded_assets = 0; var connect;
-
-	setup_timer = setInterval(function(){
-			if(typeof connect === "function"){ connect = new connect(); preloaded_assets++; }
-			if(preloaded_assets == 1 && document.readyState === 'complete'){
-					clearInterval(setup_timer);
-					connect.init();
-			}
-	},50);
-
-	</script>
-
+  <meta charset="utf-8" />
+  <title>Tallycoin Connect</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link href="assets/connect.css" rel="stylesheet">
+  <script src="assets/connect.js"></script>
+  <script>
+    // Load components when ready
+    let preloaded_assets = 0
+    let setup_timer = setInterval(() => {
+      if (typeof connect === "function") {
+        connect = new connect()
+        preloaded_assets++
+      }
+      if (preloaded_assets == 1 && document.readyState === 'complete') {
+        clearInterval(setup_timer)
+        connect.init()
+      }
+    }, 50)
+  </script>
 </head>
-
 <body>
+  <div id="fullwidth">
+    <div class="topshelf">
+      <div style="max-width:1200px;margin-left: auto; margin-right: auto;">
+        <div style="float:left;text-align:left;"><img src="assets/tallycoin-connect.png" style="width:60%"></div>
+        <div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()"><span id="sync">&#9679;</span>
+          Setup</div>
+        <div class="navitem" onclick="connect.open_invoices()">Transactions</div>
+        <div style="clear:both"></div>
+      </div>
+    </div>
 
-	<div id="fullwidth">
-		<div class="topshelf">
-			<div style="max-width:1200px;margin-left: auto; margin-right: auto;">
-				<div style="float:left;text-align:left;"><img src="assets/tallycoin-connect.png" style="width:60%"></div>
-				<div class="navitem" style="margin-left:50px;" onclick="connect.open_setup()"><span id="sync">&#9679;</span> Setup</div>
-				<div class="navitem" onclick="connect.open_invoices()">Transactions</div>
-				<div style="clear:both"></div>
-			</div>
-		</div>
-
-		<div id="setup">
-
-			<div class="smtext" id="error">
-				<p>There was a problem during setup:</p>
-				<p id="errorDetails">There was a problem during setup:</p>
-				<p>Make sure Tallycoin Connect has been installed correctly. <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a></p>
-			</div>
+    <div id="setup">
+      <div class="smtext" id="error">
+        <p>There was a problem during setup:</p>
+        <p id="errorDetails">There was a problem during setup:</p>
+        <p>
+          Make sure Tallycoin Connect has been installed correctly.
+          <a href="https://github.com/djbooth007/tallycoin_connect" target="_github">[See instructions]</a>
+        </p>
+      </div>
 
       <div id="settings-file">
         <div class="text">Your API Key</div>
-
-        <input type="text" id="api_key" onkeyup="connect.check_enter(event, 'api')"> <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save API</div>
+        <input type="text" id="api_key" onkeyup="connect.check_enter(event, 'api')">
+        <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save API</div>
         <div class="saved" id="saved_api">&#x2714; DONE</div>
-
-        <div class="text smtext">Don't have your Tallycoin API key?<br/><a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect</div>
-
+        <div class="text smtext">
+          Don't have your Tallycoin API key?<br />
+          <a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect
+        </div>
         <hr>
-
         <div class="text">Restrict Access</div>
-
-        <input type="password" id="passwd" onkeyup="connect.check_enter(event, 'passwd')"> <div id="save_passwd" class="btn" onclick="connect.submit_passwd()">Save Password</div>
+        <input type="password" id="passwd" onkeyup="connect.check_enter(event, 'passwd')">
+        <div id="save_passwd" class="btn" onclick="connect.submit_passwd()">Save Password</div>
         <div class="saved" id="saved_passwd">&#x2714; DONE</div>
-
         <div class="text smtext">Prevent unwanted visitors from accessing this page by setting a password.</div>
       </div>
 
       <div id="settings-env">
         <div class="text">Your API Key</div>
-
         <pre id="api_key_readonly"></pre>
-
-        <div class="text smtext">Don't have your Tallycoin API key?<br/><a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect</div>
+        <div class="text smtext">
+          Don't have your Tallycoin API key?<br />
+          <a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect
+        </div>
       </div>
-		</div>
+    </div>
 
-		<div id="invoice-table">
+    <div id="invoice-table">
+      <div style="display:block;">
+        <div class="paid_sats"><span id="paid_sats_total"></span> sats</div>
+        <label class="radiolabel">All
+          <input value="all" type="radio" name="inv_status" id="inv_status_all" onclick="connect.change_status('all')">
+          <span class="radiobtn"></span>
+        </label>
+        <label class="radiolabel">Paid
+          <input value="paid" type="radio" id="inv_status_paid" name="inv_status"
+            onclick="connect.change_status('paid')">
+          <span class="radiobtn"></span>
+        </label>
+        <label class="radiolabel">Not Paid
+          <input value="unpaid" type="radio" id="inv_status_unpaid" name="inv_status"
+            onclick="connect.change_status('unpaid')">
+          <span class="radiobtn"></span>
+        </label>
+      </div>
 
-			<div style="display:block;">
+      <div class="table100 ver3 m-b-110">
+        <div class="table100-head">
+          <table>
+            <thead>
+              <tr class="row100 head">
+                <th class="column1">Status</th>
+                <th class="column2">Date</th>
+                <th class="column3">Sats</th>
+                <th class="column4">Description</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
 
-				<div class="paid_sats"><span id="paid_sats_total"></span> sats</div>
+        <div class="table100-body">
+          <table>
+            <tbody id="invoice_list"></tbody>
+          </table>
+        </div>
+      </div>
 
-				<label class="radiolabel">All
-				  <input value="all" type="radio" name="inv_status" id="inv_status_all" onclick="connect.change_status('all')">
-				  <span class="radiobtn"></span>
-				</label>
-
-				<label class="radiolabel">Paid
-				  <input value="paid" type="radio" id="inv_status_paid" name="inv_status" onclick="connect.change_status('paid')">
-				  <span class="radiobtn"></span>
-				</label>
-
-				<label class="radiolabel">Not Paid
-				  <input value="unpaid" type="radio" id="inv_status_unpaid" name="inv_status" onclick="connect.change_status('unpaid')">
-				  <span class="radiobtn"></span>
-				</label>
-
-			</div>
-
-			<div class="table100 ver3 m-b-110">
-				<div class="table100-head">
-					<table>
-						<thead>
-							<tr class="row100 head">
-								<th class="column1">Status</th>
-								<th class="column2">Date</th>
-								<th class="column3">Sats</th>
-								<th class="column4">Description</th>
-							</tr>
-						</thead>
-					</table>
-				</div>
-
-				<div class="table100-body">
-					<table>
-						<tbody id="invoice_list"></tbody>
-					</table>
-				</div>
-			</div>
-
-			<div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
-
-		</div>
-
-	</div>
-
-	<audio id="sfx" >
-	  <source src="assets/incoming_tx.ogg" type="audio/ogg">
-	  <source src="assets/incoming_tx.mp3" type="audio/mpeg">
-	</audio>
-
+      <div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
+    </div>
+  </div>
+  <audio id="sfx">
+    <source src="assets/incoming_tx.ogg" type="audio/ogg">
+    <source src="assets/incoming_tx.mp3" type="audio/mpeg">
+  </audio>
 </body>
 </html>

@@ -1,21 +1,14 @@
 #!/bin/bash
 
 [Unit]
-
 Description=Tallycoin Connect
 
 [Service]
-
 PIDFile=/tmp/tallycoin-99.pid
-
 Restart=always
-
 KillSignal=SIGQUIT
-
 WorkingDirectory={{working_directory}}
-
 ExecStart=/usr/bin/node {{working_directory}}/tallycoin_connect.js
 
 [Install]
-
 WantedBy=multi-user.target

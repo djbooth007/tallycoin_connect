@@ -1,49 +1,45 @@
 <html>
 <head>
-	<meta charset="utf-8" />
-	<title>Tallycoin Connect</title>
-	<link rel="icon" type="image/png" href="assets/favicon.png">
-	<link href="assets/connect.css" rel="stylesheet">
-	<script>
-	function login(){
-		var passwd = document.getElementById('passwd').value;
-		var json = {"passwd": passwd };
+  <meta charset="utf-8" />
+  <title>Tallycoin Connect</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link href="assets/connect.css" rel="stylesheet">
+  <script>
+    function login() {
+      const passwd = document.getElementById('passwd').value
+      const json = { "passwd": passwd }
+      const xhr = new XMLHttpRequest()
+      xhr.onload = function () {
+        const res = JSON.parse(this.response)
+        if (res.login_state == 'Y') {
+          location.reload()
+        } else if (res.login_state == 'N') {
+          document.getElementById('failed').style.display = 'inherit'
+          setTimeout(() => {
+            document.getElementById('failed').style.display = 'none'
+          }, 2000)
+        }
+      }
+      xhr.open("POST", 'login', true)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.send(JSON.stringify(json))
+    }
 
-		var xhr = new XMLHttpRequest();
-		xhr.onload = function() {
-				var res = JSON.parse(this.response);
-				if(res.login_state == 'Y'){ location.reload(); }
-				if(res.login_state == 'N'){
-						document.getElementById('failed').style.display = 'inherit';
-						setTimeout(function(){ document.getElementById('failed').style.display = 'none'; },2000);
-				}
-		}
-		xhr.open("POST", 'login', true);
-		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.send(JSON.stringify(json));
-	}
-
-	function check_enter(e){
-		if(e.keyCode === 13){
-			e.preventDefault();
-			login();
-		}
-	}
-	</script>
-
+    function check_enter(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        login()
+      }
+    }
+  </script>
 </head>
-
 <body>
-
-	<div class="login_box">
-
-		<div class="block" style="text-align:center"><img src="assets/tallycoin-connect.png"></div>
-		<div class="smtext">Enter Password</div>
-
-		<input type="password" id="passwd" onkeyup="check_enter(event)"><br/><div style="margin-top:20px;" class="btn" onclick="login()">Login</div>
-		<div id="failed" class="saved" style="color:#bb0000;margin:20px 0 0 0;">Login failed</div>
-
-	</div>
-
+  <div class="login_box">
+    <div class="block" style="text-align:center"><img src="assets/tallycoin-connect.png"></div>
+    <div class="smtext">Enter Password</div>
+    <input type="password" id="passwd" onkeyup="check_enter(event)"><br />
+    <div style="margin-top:20px;" class="btn" onclick="login()">Login</div>
+    <div id="failed" class="saved" style="color:#bb0000;margin:20px 0 0 0;">Login failed</div>
+  </div>
 </body>
 </html>
