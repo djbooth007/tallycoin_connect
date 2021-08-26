@@ -78,7 +78,6 @@ let connect = function () {
       }
     })
 
-    connect.insert_table_row('', '', '', '', '', '', '')
     document.getElementById('paid_sats_total').innerHTML = connect.format_number(paid_sats_total)
     connect.change_status(localStorage.getItem('tcc_status_pref'))
   }
@@ -173,7 +172,6 @@ let connect = function () {
   this.change_status = status => {
     const table = document.getElementById('invoice_list');
     for (let i = 0, row; row = table.rows[i]; i++) {
-      row.style.display = 'inherit'
       if (
         status == 'paid' && row.dataset.status == 'unpaid' ||
         status == 'unpaid' && row.dataset.status == 'paid'
