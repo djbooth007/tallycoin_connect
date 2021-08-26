@@ -1,254 +1,272 @@
-//
-// TALLYCOIN CONNECT //
-//
+let connect = function () {
+  let last_id = '', all_count = 0, paid_count = 0, unpaid_count = 0
 
-var connect = function(){
+  this.init = () => {
+    const xhr_api = new XMLHttpRequest()
+    xhr_api.onload = function () {
+      if (this.response !== null) {
+        connect.check_key(this.response)
+      }
+    }
+    xhr_api.open('POST', 'sync')
+    xhr_api.setRequestHeader('Content-Type', 'application/json')
+    xhr_api.responseType = 'json'
+    xhr_api.send()
 
-	var last_id = ''; var all_count = 0; var paid_count = 0; var unpaid_count = 0;
+    if (localStorage.getItem('tcc_status_pref') == null) {
+      localStorage.setItem('tcc_status_pref', 'all')
+    }
+    document.getElementById('fullwidth').style.width = window.innerWidth
+  }
 
-	this.init = function(){
+  this.retrieve_list = () => {
+    const xhr_list = new XMLHttpRequest()
+    xhr_list.onload = function () {
+      const json = JSON.parse(this.response)
+      if (json.error) {
+        connect.lnd_setup_error(json.error)
+      } else {
+        connect.insert_list(json.invoices)
+      }
+    }
+    xhr_list.open('POST', 'list', true)
+    xhr_list.setRequestHeader('Content-Type', 'application/json')
+    xhr_list.send()
+  }
 
-			var xhr_api = new XMLHttpRequest();
-			xhr_api.onload = function() {
-					if(this.response !== null){ connect.check_key(this.response); }
-			}
-			xhr_api.open( 'POST', 'sync' );
-			xhr_api.setRequestHeader('Content-Type', 'application/json');
-			xhr_api.responseType = 'json';
-			xhr_api.send();
+  this.insert_list = list => {
+    all_count = 0
+    paid_count = 0
+    unpaid_count = 0
+    paid_sats_total = 0
+    document.getElementById('invoice_list').innerHTML = ''
 
-			if(localStorage.getItem("tcc_status_pref") == null){ localStorage.setItem("tcc_status_pref",'all'); }
-			document.getElementById('fullwidth').style.width = window.innerWidth;
-	}
+    Object.values(list).forEach(invoice => {
+      const description = invoice['description']
 
-	this.retrieve_list = function(){
-
-			var xhr_list = new XMLHttpRequest();
-			xhr_list.onload = function() {
-        const json = JSON.parse(this.response)
-        if (json.error) {
-          connect.lnd_setup_error(json.error);
+      if (description.includes('Tallycoin')) {
+        const received = parseInt(invoice['received']) // amount received in satoshis
+        const tokens = parseInt(invoice['tokens']) // amount requested in satoshis
+        let status, dotbg, fc
+        if (received >= tokens) {
+          status = 'paid'
+          dotbg = 'green'
+          fc = ' whitefont'
+          paid_count++
+          paid_sats_total += received
         } else {
-          connect.insert_list(json.invoices);
+          status = 'unpaid'
+          dotbg = '#fdc948'
+          fc = ' greyfont'
+          unpaid_count++
         }
-			}
-			xhr_list.open('POST', 'list', true);
-			xhr_list.setRequestHeader('Content-Type', 'application/json');
-			xhr_list.send();
-	}
+        all_count++
 
-	this.insert_list = function(list){
+        // notify new paid transaction
+        if (paid_count == 1 && last_id != invoice['id'] && last_id != '' && status == 'paid') {
+          last_id = invoice['id']
+          connect.new_transaction_received()
+        }
 
-			all_count = 0; paid_count = 0; unpaid_count = 0; paid_sats_total = 0;
-			document.getElementById('invoice_list').innerHTML = '';
+        // insert into table
+        const amount = status == 'paid' ? received.toString() : tokens.toString()
+        if (paid_count == 1 && last_id == '') {
+          last_id = invoice['id']
+        }
 
-			Object.values(list).forEach(invoice => {
+        connect.insert_table_row(status, invoice['id'], dotbg, fc, invoice['created_at'], amount, description)
+      }
+    })
 
-					var description = invoice['description'];
+    connect.insert_table_row('', '', '', '', '', '', '')
+    document.getElementById('paid_sats_total').innerHTML = connect.format_number(paid_sats_total)
+    connect.change_status(localStorage.getItem('tcc_status_pref'))
+  }
 
-					if(description.includes("Tallycoin")){
+  this.insert_table_row = (status, invoice_id, dotbg, fc, created_at, amount, description) => {
+    // create table row
+    const tr = document.createElement('tr')
+    tr.dataset.status = status
+    tr.dataset.inv_id = invoice_id
 
-							var received = parseInt(invoice['received']); // amount received in satoshis
-							var tokens = parseInt(invoice['tokens']); // amount requested in satoshis
-							if(received >= tokens){
-									var status = 'paid'; var dotbg = 'green;'; var fc = ' whitefont';
-									paid_count++;   paid_sats_total += received;
-							}else{
-									var status = 'unpaid'; var dotbg = '#fdc948;'; var fc = ' greyfont';
-									unpaid_count++;
-							}
-							all_count++;
+    // cell 1
+    let td = document.createElement('td')
+    td.classList = 'column1'
+    if (dotbg != '') {
+      td.innerHTML = `<span class="dot" style="background-color:${dotbg}"></span>`
+    }
+    tr.appendChild(td)
 
-							// notify new paid transaction
-							if(paid_count == 1 && last_id != invoice['id'] && last_id != '' && status == 'paid'){ last_id = invoice['id']; connect.new_transaction_received(); }
+    // cell 2
+    td = document.createElement('td')
+    td.classList = `column2${fc}`
+    if (created_at != '') {
+      const t = document.createTextNode(connect.format_date(created_at))
+      td.appendChild(t)
+    }
+    tr.appendChild(td)
 
-							// insert into table
-							if(status == 'paid'){ var amount = received.toString(); }else{ var amount = tokens.toString(); }
-							if(paid_count == 1 && last_id == ''){ last_id = invoice['id']; }
+    // cell 3
+    td = document.createElement('td')
+    td.classList = `column3${fc}`
+    if (amount != '') {
+      const t = document.createTextNode(connect.format_number(amount))
+      td.appendChild(t)
+    }
+    tr.appendChild(td)
 
-							connect.insert_table_row(status,invoice['id'],dotbg,fc,invoice['created_at'],amount,description);
-					}
-			});
+    // cell 4
+    td = document.createElement('td')
+    td.classList = `column4${fc}`
+    if (description == '') {
+      td.innerHTML = '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'
+    } else {
+      const t = document.createTextNode(description)
+      td.appendChild(t)
+    }
+    tr.appendChild(td)
 
-			connect.insert_table_row('','','','','','','');
+    // add to table
+    document.getElementById('invoice_list').append(tr)
+  }
 
-			document.getElementById('paid_sats_total').innerHTML = connect.format_number(paid_sats_total);
+  this.update_tx_count = () => {
+    const pref = localStorage.getItem('tcc_status_pref')
+    if (pref == 'all') { document.getElementById('inv_count').innerHTML = all_count }
+    if (pref == 'paid') { document.getElementById('inv_count').innerHTML = paid_count }
+    if (pref == 'unpaid') { document.getElementById('inv_count').innerHTML = unpaid_count }
+  }
 
-			connect.change_status(localStorage.getItem("tcc_status_pref"));
-	}
+  this.new_transaction_received = () => {
+    document.title = '(NEW) Tallycoin Connect'
+    setTimeout(() => { document.title = 'Tallycoin Connect' }, 1000)
+    setTimeout(() => { document.title = '(NEW) Tallycoin Connect' }, 1500)
+    setTimeout(() => { document.title = 'Tallycoin Connect' }, 2500)
+    setTimeout(() => { document.title = '(NEW) Tallycoin Connect' }, 3000)
+    setTimeout(() => { document.title = 'Tallycoin Connect' }, 20000)
 
-	this.insert_table_row = function(status,invoice_id,dotbg,fc,created_at,amount,description){
+    const audio = document.getElementById('sfx')
+    audio.play()
+  }
 
-			// create table row
-			var tr = document.createElement("tr");
-			tr.dataset.status = status;
-			tr.dataset.inv_id = invoice_id;
+  this.format_date = date => {
+    date = new Date(date)
+    year = date.getFullYear()
+    month = date.getMonth() + 1
+    dt = date.getDate()
 
-			// cell 1
-			var td = document.createElement("td");
-			td.classList = 'column1';
-			if(dotbg != ''){ td.innerHTML = '<span class="dot" style="background-color:'+dotbg+'"></span>'; }
-			tr.appendChild(td);
+    if (dt < 10) {
+      dt = '0' + dt
+    }
+    if (month < 10) {
+      month = '0' + month
+    }
 
-			// cell 2
-			var td = document.createElement("td");
-			td.classList = 'column2'+fc;
-			if(created_at != ''){
-					var t = document.createTextNode(connect.format_date(created_at));
-					td.appendChild(t);
-			}
-			tr.appendChild(td);
+    let hours = ((date.getHours() < 10) ? '' : '') + ((date.getHours() > 12) ? (date.getHours() - 12) : date.getHours())
+    if (hours == 0 && ((date.getHours() >= 12) ? ('PM') : 'AM') == 'AM') {
+      hours = 12
+    }
+    const time = `${hours}:${((date.getMinutes() < 10) ? '0' : '')}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`
+    return `${year}-${month}-${dt} ${time}`
+  }
 
-			// cell 3
-			var td = document.createElement("td");
-			td.classList = 'column3'+fc;
-			if(amount != ''){
-					var t = document.createTextNode(connect.format_number(amount));
-					td.appendChild(t);
-			}
-			tr.appendChild(td);
+  this.change_status = status => {
+    const table = document.getElementById('invoice_list');
+    for (let i = 0, row; row = table.rows[i]; i++) {
+      row.style.display = 'inherit'
+      if (
+        status == 'paid' && row.dataset.status == 'unpaid' ||
+        status == 'unpaid' && row.dataset.status == 'paid'
+      ) {
+        row.style.display = 'none'
+      }
+    }
 
-			// cell 4
-			var td = document.createElement("td");
-			td.classList = 'column4'+fc;
-			if(description == ''){
-					td.innerHTML = '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;';
-			}else{
-					var t = document.createTextNode(description);
-					td.appendChild(t);
-			}
-			tr.appendChild(td);
+    localStorage.setItem('tcc_status_pref', status)
 
-			// add to table
-			document.getElementById('invoice_list').append(tr);
-	}
+    radiobtn = document.getElementById(`inv_status_${status}`)
+    radiobtn.checked = true
+    connect.update_tx_count()
+  }
 
-	this.update_tx_count = function(){
-			var pref = localStorage.getItem("tcc_status_pref");
-			if(pref == 'all'){ document.getElementById('inv_count').innerHTML = all_count; }
-			if(pref == 'paid'){ document.getElementById('inv_count').innerHTML = paid_count; }
-			if(pref == 'unpaid'){ document.getElementById('inv_count').innerHTML = unpaid_count; }
-	}
+  this.format_number = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 
-	this.new_transaction_received = function(){
-			document.title = '(NEW) Tallycoin Connect';
-			setTimeout(function(){ document.title = 'Tallycoin Connect'; },1000);
-			setTimeout(function(){ document.title = '(NEW) Tallycoin Connect'; },1500);
-			setTimeout(function(){ document.title = 'Tallycoin Connect'; },2500);
-			setTimeout(function(){ document.title = '(NEW) Tallycoin Connect'; },3000);
-			setTimeout(function(){ document.title = 'Tallycoin Connect'; },20000);
-			var audio = document.getElementById("sfx");     audio.play();
-	}
+  this.lnd_setup_error = errorDetails => {
+    document.getElementById('error').style.display = 'block'
+    document.getElementById('errorDetails').innerText = errorDetails
+    document.getElementById('sync').style.color = '#bb0000'
+  }
 
-	this.format_date = function(date){
-			date = new Date(date);
-			year = date.getFullYear();
-			month = date.getMonth()+1;
-			dt = date.getDate();
+  this.saved_api = () => {
+    document.getElementById('saved_api').style.display = 'inline-block'
+    setTimeout(location.reload, 5000)
+  }
 
-			if (dt < 10) {  dt = '0' + dt; }
-			if (month < 10) { month = '0' + month; }
+  this.saved_passwd = () => {
+    document.getElementById('saved_passwd').style.display = 'inline-block'
+    setTimeout(location.reload, 5000)
+  }
 
-			var hours = ((date.getHours() < 10)?"":"") + ((date.getHours()>12)?(date.getHours()-12):date.getHours());
-			if(hours == 0 && ((date.getHours()>=12)?('PM'):'AM') == 'AM'){ hours = 12; }
-			var time = hours +":"+ ((date.getMinutes() < 10)?"0":"") + date.getMinutes() + " " + ((date.getHours()>=12)?('PM'):'AM');
-			return year+'-' + month + '-'+dt+' '+time;
-	}
+  this.open_setup = () => {
+    document.getElementById('setup').style.display = 'block'
+    document.getElementById('invoice-table').style.display = 'none'
+  }
 
-	this.change_status = function(status){
-			var table = document.getElementById("invoice_list");
-			for (var i = 0, row; row = table.rows[i]; i++) {
-					row.style.display = 'inherit';
-					if(status == 'paid' && row.dataset.status == 'unpaid'){ row.style.display = 'none'; }
-					if(status == 'unpaid' && row.dataset.status == 'paid'){ row.style.display = 'none'; }
-			}
+  this.open_invoices = () => {
+    document.getElementById('setup').style.display = 'none'
+    document.getElementById('invoice-table').style.display = 'block'
+  }
 
-			localStorage.setItem("tcc_status_pref",status);
+  this.check_key = json => {
+    if (json.api != '') {
+      document.getElementById('api_key').value = document.getElementById('api_key_readonly').textContent = json.api
+      if (json.from_env == true) {
+        document.getElementById('settings-file').style.display = 'none'
+      } else {
+        document.getElementById('settings-env').style.display = 'none'
+      }
+      connect.retrieve_list()
+      setInterval(connect.retrieve_list, 30000)
+    }
 
-			radiobtn = document.getElementById("inv_status_"+status); radiobtn.checked = true;
-			connect.update_tx_count();
-	}
+    connect.sync_status(json)
+  }
 
-	this.format_number = function(x) {
-			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-	}
+  this.sync_status = json => {
+    let color = '#bb0000'
+    if (json.sync == 'Y' && json.lnd == 'Y' && json.api != '') {
+      color = 'green'
+    }
+    document.getElementById('sync').style.color = color
+  }
 
-	this.lnd_setup_error = function(errorDetails){
-			document.getElementById('error').style.display = 'block';
-			document.getElementById('errorDetails').innerText = errorDetails;
-			document.getElementById('sync').style.color = '#bb0000';
-	}
+  this.submit_api = () => {
+    const api = document.getElementById('api_key').value
+    const xhr = new XMLHttpRequest()
 
-	this.saved_api = function(){
-			document.getElementById('saved_api').style.display = 'inline-block';
-			setTimeout(function(){ location.reload(); },5000);
-	}
+    xhr.open('POST', 'save_api', true)
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.send(JSON.stringify({ api }))
 
-	this.saved_passwd = function(){
-			document.getElementById('saved_passwd').style.display = 'inline-block';
-			setTimeout(function(){ location.reload(); },5000);
-	}
+    connect.saved_api()
+  }
 
-	this.open_setup = function(){
-			document.getElementById('setup').style.display = 'block';
-			document.getElementById('invoice-table').style.display = 'none';
-	}
+  this.submit_passwd = () => {
+    const passwd = document.getElementById('passwd').value
+    const xhr = new XMLHttpRequest()
 
-	this.open_invoices = function(){
-			document.getElementById('setup').style.display = 'none';
-			document.getElementById('invoice-table').style.display = 'block';
-	}
+    xhr.open('POST', 'save_passwd', true)
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.send(JSON.stringify({ passwd }))
 
-	this.check_key = function(json){
-			if(json.api != ""){
-  				document.getElementById('api_key').value = document.getElementById('api_key_readonly').textContent = json.api;
-					if(json.from_env == true){ 
-  						document.getElementById('settings-file').style.display = 'none';
-				}else{
-  						document.getElementById('settings-env').style.display = 'none';
-  				}
-					connect.retrieve_list(); setInterval(function(){ connect.retrieve_list(); }, 30000);
-			}
+    connect.saved_passwd()
+  }
 
-			connect.sync_status(json);
-	}
-
-	this.sync_status = function(json){
-			var color = '#bb0000';
-			if(json.sync == 'Y' && json.lnd == 'Y' && json.api != ''){ var color = 'green'; }
-			document.getElementById('sync').style.color = color;
-	}
-
-	this.submit_api = function(){
-			var api_key = document.getElementById('api_key').value;
-			var json = {"api": api_key };
-
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', 'save_api', true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.send(JSON.stringify(json));
-
-			connect.saved_api();
-	}
-
-	this.submit_passwd = function(){
-			var passwd = document.getElementById('passwd').value;
-			var json = {"passwd": passwd };
-
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', 'save_passwd', true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.send(JSON.stringify(json));
-
-			connect.saved_passwd();
-	}
-
-	this.check_enter = function(e, type){
-			if(e.keyCode === 13){
-					e.preventDefault();
-					if(type == 'passwd'){ connect.submit_passwd(); }
-					if(type == 'api'){ connect.submit_api(); }
-			}
-	}
-
+  this.check_enter = (e, type) => {
+    if (e.keyCode === 13) {
+      e.preventDefault()
+      if (type == 'passwd') { connect.submit_passwd() }
+      if (type == 'api') { connect.submit_api() }
+    }
+  }
 }
