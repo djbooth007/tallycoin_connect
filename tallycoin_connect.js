@@ -160,7 +160,8 @@ function start_websocket() {
 
   // Parse incoming message
   ws.on('message', function incoming(data) {
-    lightning(msg.type, JSON.parse(data))
+    const msg = JSON.parse(data)
+    lightning(msg.type, msg)
   })
 
   // Error handling. Try reconnect every 10 seconds.
