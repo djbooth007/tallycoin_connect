@@ -13,12 +13,12 @@
 		xhr.onload = function() {
 				var res = JSON.parse(this.response);
 				if(res.login_state == 'Y'){ location.reload(); }
-				if(res.login_state == 'N'){ 
+				if(res.login_state == 'N'){
 						document.getElementById('failed').style.display = 'inherit';
 						setTimeout(function(){ document.getElementById('failed').style.display = 'none'; },2000);
 				}
 		}
-		xhr.open("POST", '/login', true);
+		xhr.open("POST", 'login', true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.send(JSON.stringify(json));
 	}

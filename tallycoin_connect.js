@@ -14,6 +14,8 @@ const lnService = require('ln-service');
 const server = require('http').createServer();
 const shajs = require('sha.js')
 
+const LND_SOCKET_DEFAULT = '127.0.0.1:10009'
+
 var ws; var wstimer; let keys; var connected = 'N'; var users = [];
 
 // Create a server for transaction and setup pages
@@ -33,16 +35,21 @@ app.get('/', function(req, res){
 server.on('request', app);
 
 // Retrieve invoice list from LND
-app.post('/list', jsonParser, function(request, response){
+app.post('/list', jsonParser, function (request, response){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
 		cert: keys['tls_cert'],
 		macaroon: keys['macaroon'],
-		socket: '127.0.0.1:10009',
+    socket: keys['lnd_socket'] || LND_SOCKET_DEFAULT
 	});
 
 	lnService.getInvoices({lnd}, (err, invoices) => {
-		response.json(invoices);
+    if (err) {
+      const [code, name, { err: { details } }] = err;
+      response.status(code).json({ error: details });
+    } else {
+		  response.json(invoices);
+    }
 	});
 
 });
@@ -86,17 +93,22 @@ const {
   TALLYCOIN_PASSWD,
   LND_TLSCERT_PATH,
   LND_MACAROON_PATH,
+  LND_SOCKET = LND_SOCKET_DEFAULT,
   PORT = 8123
 } = process.env;
 
-if(TALLYCOIN_APIKEY && TALLYCOIN_PASSWD && LND_TLSCERT_PATH && LND_MACAROON_PATH){
-	keys = {
+if(TALLYCOIN_APIKEY && LND_TLSCERT_PATH && LND_MACAROON_PATH){
+  keys = {
+    lnd_socket: LND_SOCKET,
 		tallycoin_api: TALLYCOIN_APIKEY,
-		tallycoin_passwd: TALLYCOIN_PASSWD,
 		tls_cert: base64FromFile(LND_TLSCERT_PATH),
 		macaroon: base64FromFile(LND_MACAROON_PATH),
 		from_env: true
 	}
+
+  if (TALLYCOIN_PASSWD) {
+    keys.tallycoin_passwd = TALLYCOIN_PASSWD
+  }
 
 	fs.writeFileSync("tallycoin_api.key", JSON.stringify(keys));
 
@@ -204,8 +216,8 @@ function lightning(type, data){
 
 	var {lnd} = lnService.authenticatedLndGrpc({
 		cert: keys['tls_cert'],
-		macaroon: keys['macaroon'],
-		socket: '127.0.0.1:10009',
+    macaroon: keys['macaroon'],
+    socket: keys['lnd_socket'] || LND_SOCKET_DEFAULT
 	});
 
 	// When message 'payment_create' received, get fresh invoice from LND and send response to Tallycoin server

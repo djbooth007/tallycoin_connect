@@ -38,6 +38,7 @@ You can pass the credentials and file paths using these environment variables:
 - `TALLYCOIN_PASSWD`
 - `LND_TLSCERT_PATH`
 - `LND_MACAROON_PATH`
+- `LND_SOCKET`
 
 NOTE: `TALLYCOIN_PASSWD` must be a sha256 hash of your login password (optional).
 
