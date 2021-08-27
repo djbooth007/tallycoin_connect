@@ -169,6 +169,7 @@ let connect = function () {
   this.change_status = status => {
     const table = document.getElementById('invoice_list');
     for (let i = 0, row; row = table.rows[i]; i++) {
+      row.style.display = 'table-row';
       if (
         status == 'paid' && row.dataset.status == 'unpaid' ||
         status == 'unpaid' && row.dataset.status == 'paid'
