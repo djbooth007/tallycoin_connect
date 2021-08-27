@@ -16,7 +16,6 @@ let connect = function () {
     if (localStorage.getItem('tcc_status_pref') == null) {
       localStorage.setItem('tcc_status_pref', 'all')
     }
-    document.getElementById('fullwidth').style.width = window.innerWidth
   }
 
   this.retrieve_list = () => {
@@ -117,9 +116,7 @@ let connect = function () {
     // cell 4
     td = document.createElement('td')
     td.classList = `column4${fc}`
-    if (description == '') {
-      td.innerHTML = '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'
-    } else {
+    if (description !== '') {
       const t = document.createTextNode(description)
       td.appendChild(t)
     }
@@ -205,14 +202,10 @@ let connect = function () {
     setTimeout(location.reload, 5000)
   }
 
-  this.open_setup = () => {
-    document.getElementById('setup').style.display = 'block'
-    document.getElementById('invoice-table').style.display = 'none'
-  }
-
-  this.open_invoices = () => {
+  this.open_page = (name) => {
     document.getElementById('setup').style.display = 'none'
-    document.getElementById('invoice-table').style.display = 'block'
+    document.getElementById('transactions').style.display = 'none'
+    document.getElementById(name).style.display = 'block'
   }
 
   this.check_key = json => {
