@@ -7,7 +7,7 @@
   <script>
     function login() {
       const passwd = document.getElementById('passwd').value
-      const json = { "passwd": passwd }
+      const json = { passwd }
       const xhr = new XMLHttpRequest()
       xhr.onload = function () {
         const res = JSON.parse(this.response)
@@ -20,7 +20,7 @@
           }, 2000)
         }
       }
-      xhr.open("POST", 'login', true)
+      xhr.open('POST', 'login', true)
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(JSON.stringify(json))
     }
