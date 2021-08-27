@@ -6,9 +6,6 @@ body {
   margin: 0;
   background: #171717;
 }
-#fullwidth {
-  text-align: center;
-}
 .topshelf {
   padding: 10px 20px;
   color: white;
@@ -99,8 +96,7 @@ hr {
   margin: 0.4rem 1rem 0 0;
   background-color: #fdc948;
 }
-
-#invoice-table {
+#invoices {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -126,29 +122,26 @@ th {
 .column4 {
   width: 50%;
 }
-.table100-head th {
-  padding-top: 18px;
-  padding-bottom: 18px;
-}
-.table100-body td {
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-.table100 {
+#invoices {
   position: relative;
-  padding-top: 60px;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  border-radius: 10px;
 }
-.table100-head {
-  position: absolute;
-  width: 100%;
+#invoices table {
+  overflow: hidden;
+  background-color: #333;
+  border-radius: 10px;
+}
+#invoices thead {
+  position: sticky;
   top: 0;
   left: 0;
+  right: 0;
 }
-.table100-body {
-  max-height: 585px;
-  overflow: auto;
-}
-.table100.ver3 th {
+#invoices th {
+  padding-top: 18px;
+  padding-bottom: 18px;
   font-family: Arial;
   font-size: 1.2rem;
   color: #ffffff;
@@ -156,25 +149,20 @@ th {
   text-transform: uppercase;
   background-color: #393939;
 }
-.table100.ver3 td {
+#invoices td {
+  padding-top: 16px;
+  padding-bottom: 16px;
   font-family: Arial;
   font-size: 1.3rem;
   line-height: 1.4;
   background-color: #222222;
 }
-.table100.ver3 {
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #333;
-  right: 5px;
-}
 #tx_count {
   font-size: 1rem;
   font-weight: 500;
-  text-align: left;
+  text-align: center;
   margin-top: 20px;
 }
-
 .paid_sats {
   display: inline-block;
   background: #056d05;
@@ -196,7 +184,6 @@ th {
 }
 
 /* RADIO BUTTONS */
-
 .radiolabel {
   display: inline-block;
   position: relative;
