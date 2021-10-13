@@ -1,4 +1,4 @@
-FROM node:16-buster-slim
+FROM arm32v7/node:16-buster-slim
 WORKDIR /opt/tallycoin_connect
 
 # Install and update system dependencies
