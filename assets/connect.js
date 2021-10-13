@@ -211,12 +211,7 @@ let connect = function () {
 
   this.check_key = json => {
     if (json.api != '') {
-      document.getElementById('api_key').value = document.getElementById('api_key_readonly').textContent = json.api
-      if (json.from_env == true) {
-        document.getElementById('settings-file').style.display = 'none'
-      } else {
-        document.getElementById('settings-env').style.display = 'none'
-      }
+      document.getElementById('api_key').value = json.api
       connect.retrieve_list()
       setInterval(connect.retrieve_list, 30000)
     }
