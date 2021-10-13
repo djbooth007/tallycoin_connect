@@ -41,7 +41,7 @@
       </p>
     </div>
 
-    <div id="settings-file">
+    <div id="settings">
       <div class="text">Your API Key</div>
       <input type="text" id="api_key" onkeyup="connect.check_enter(event, 'api')">
       <div id="save_api_key" class="btn" onclick="connect.submit_api()">Save API</div>
@@ -56,15 +56,6 @@
       <div id="save_passwd" class="btn" onclick="connect.submit_passwd()">Save Password</div>
       <div class="saved" id="saved_passwd">&#x2714; DONE</div>
       <div class="text smtext">Prevent unwanted visitors from accessing this page by setting a password.</div>
-    </div>
-
-    <div id="settings-env">
-      <div class="text">Your API Key</div>
-      <pre id="api_key_readonly"></pre>
-      <div class="text smtext">
-        Don't have your Tallycoin API key?<br />
-        <a href="https://tallycoin.app/" target="_tallycoin">Login</a> and go to Admin Dashboard > Node Connect
-      </div>
     </div>
   </div>
 
