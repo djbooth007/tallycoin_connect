@@ -25,6 +25,7 @@ const base64FromFile = file => Buffer.from(fs.readFileSync(file)).toString('base
 const {
   TALLYCOIN_APIKEY,
   TALLYCOIN_PASSWD,
+  TALLYCOIN_PASSWD_CLEARTEXT,
   LND_TLSCERT_PATH,
   LND_MACAROON_PATH,
   LND_SOCKET = '127.0.0.1:10009',
@@ -46,6 +47,7 @@ if (LND_MACAROON_PATH) keys.macaroon = base64FromFile(LND_MACAROON_PATH)
 if (!keys.lnd_socket && LND_SOCKET) keys.lnd_socket = LND_SOCKET
 if (!keys.tallycoin_api && TALLYCOIN_APIKEY) keys.tallycoin_api = TALLYCOIN_APIKEY
 if (!keys.tallycoin_passwd && TALLYCOIN_PASSWD) keys.tallycoin_passwd = TALLYCOIN_PASSWD
+if (!keys.tallycoin_passwd && TALLYCOIN_PASSWD_CLEARTEXT) keys.tallycoin_passwd = passwdHash(TALLYCOIN_PASSWD_CLEARTEXT)
 
 writeConfig(keys)
 
@@ -55,7 +57,7 @@ app.set('trust proxy', true)
 app.use('/assets', express.static(__dirname + '/assets'))
 
 app.get('/', (req, res) => {
-  if (users.includes(req.ip) || keys.tallycoin_passwd == '' || keys.tallycoin_passwd == null) {
+  if (users.includes(req.ip) || !keys.tallycoin_passwd) {
     res.sendFile(__dirname + '/index.html')
   } else {
     res.sendFile(__dirname + '/login.html')
