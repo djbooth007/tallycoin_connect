@@ -188,10 +188,11 @@ function lightning(type, data) {
 
   // When message 'payment_create' received, get fresh invoice from LND and send response to Tallycoin server
   if (type == 'payment_create') {
-    lnService.createInvoice({ lnd, is_including_private_channels: true, description: data.description, tokens: data.amount }, (err, invoice) => {
+    lnService.createInvoice({ lnd, is_including_private_channels: true, is_fallback_included: true, description: data.description, tokens: data.amount }, (err, invoice) => {
       ws.send(JSON.stringify({
         type: 'payment_data',
         id: invoice['id'],
+        chain_address: invoice['chain_address'],
         payment_request: invoice['request'],
         api_key: keys.tallycoin_api,
         unique_id: data.unique_id
