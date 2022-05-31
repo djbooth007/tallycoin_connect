@@ -96,8 +96,8 @@ hr {
   margin-right: auto;
   text-align: left;
 }
-#settings, #transactions { 
-	padding: 0 25px 0 25px; 
+#setup, #transactions { 
+  padding: 0 25px 0 25px; 
 }
 .dot {
   display: inline-flex;
