@@ -1,7 +1,11 @@
 let connect = function () {
   let last_id = '', all_count = 0, paid_count = 0, unpaid_count = 0
+  var locale_format = { "decimal": ".", "thousand": "," }
 
   this.init = () => {
+	
+	connect.set_locale();	
+	  
     const xhr_api = new XMLHttpRequest()
     xhr_api.onload = function () {
       if (this.response !== null) {
@@ -17,7 +21,9 @@ let connect = function () {
       localStorage.setItem('tcc_status_pref', 'all')
     }
   }
-
+  
+  // TRANSACTION LIST
+  
   this.retrieve_list = () => {
     const xhr_list = new XMLHttpRequest()
     xhr_list.onload = function () {
@@ -41,9 +47,10 @@ let connect = function () {
     document.getElementById('invoice_list').innerHTML = ''
 
     Object.values(list).forEach(invoice => {
-      const description = invoice['description']
+      let description = invoice['description']
 
       if (description.includes('Tallycoin')) {
+		description = description.replace("#Tallycoin",""); // remove hashtag  
         const received = parseInt(invoice['received']) // amount received in satoshis
         const tokens = parseInt(invoice['tokens']) // amount requested in satoshis
         let status, dotbg, fc
@@ -145,31 +152,10 @@ let connect = function () {
     audio.play()
   }
 
-  this.format_date = date => {
-    date = new Date(date)
-    year = date.getFullYear()
-    month = date.getMonth() + 1
-    dt = date.getDate()
-
-    if (dt < 10) {
-      dt = '0' + dt
-    }
-    if (month < 10) {
-      month = '0' + month
-    }
-
-    let hours = ((date.getHours() < 10) ? '' : '') + ((date.getHours() > 12) ? (date.getHours() - 12) : date.getHours())
-    if (hours == 0 && ((date.getHours() >= 12) ? ('PM') : 'AM') == 'AM') {
-      hours = 12
-    }
-    const time = `${hours}:${((date.getMinutes() < 10) ? '0' : '')}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`
-    return `${year}-${month}-${dt} ${time}`
-  }
-
   this.change_status = status => {
-    const table = document.getElementById('invoice_list');
+    const table = document.getElementById('invoice_list')
     for (let i = 0, row; row = table.rows[i]; i++) {
-      row.style.display = 'table-row';
+      row.style.display = 'table-row'
       if (
         status == 'paid' && row.dataset.status == 'unpaid' ||
         status == 'unpaid' && row.dataset.status == 'paid'
@@ -184,15 +170,58 @@ let connect = function () {
     radiobtn.checked = true
     connect.update_tx_count()
   }
+  
+  // FORMATTING
 
-  this.format_number = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  this.format_date = date => {
+    date = new Date(date)
+    year = date.getFullYear()
+    month = date.getMonth() + 1
+	months = ['','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+    dt = date.getDate()
+
+    let hours = ((date.getHours() < 10) ? '' : '') + ((date.getHours() > 12) ? (date.getHours() - 12) : date.getHours())
+    if (hours == 0 && ((date.getHours() >= 12) ? ('PM') : 'AM') == 'AM') { hours = 12 }
+
+    const time = `${hours}:${((date.getMinutes() < 10) ? '0' : '')}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`
+    return `${dt} ${months[month]} ${year} ${time}`
+  }
+ 
+  this.set_locale = function(){
+	var test_str = parseFloat(1234.56).toLocaleString()
+
+	if (test_str.match("1")){ 
+		locale_format.decimal = test_str.replace(/.*4(.*)5.*/, "$1")
+		locale_format.thousand = test_str.replace(/.*1(.*)2.*/, "$1")
+	}
+  }
+
+  this.locale_formatting = function(num){	
+	// transform number to localised format
+	var num = num.toString()
+	if(num.indexOf(".") > 0){ num = num.replace(".",locale_format.decimal); }
+
+	// split number by integer and decimal
+	var d = num.split(locale_format.decimal)	
+	var integer = d[0].toString().replaceAll(locale_format.thousand,"")
+
+	var reconstructed = integer.replaceAll(/\B(?=(\d{3})+(?!\d))/g, locale_format.thousand)		
+	return reconstructed;
+  }	
+  
+  this.format_number = x => {
+	  x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '')
+	  return connect.locale_formatting(x)
+  }
+
+  // CONFIG
 
   this.lnd_setup_error = errorDetails => {
     document.getElementById('error').style.display = 'block'
     document.getElementById('errorDetails').innerText = errorDetails
     document.getElementById('sync').style.color = '#bb0000'
   }
-
+  
   this.saved_api = () => {
     document.getElementById('saved_api').style.display = 'inline-block'
     setTimeout(location.reload, 5000)

@@ -1,15 +1,15 @@
 body {
-  font-size: 2rem;
+  font-size: 1.2rem;
   color: white;
   font-family: Arial;
   border: 0;
   margin: 0;
-  background: #171717;
+  background: #2b2f37;
 }
 .topshelf {
   padding: 10px 20px;
   color: white;
-  background: #053856;
+  background: #1d1e24;
   margin-bottom: 40px;
   text-align: center;
   margin-left: auto;
@@ -19,34 +19,42 @@ body {
   float: right;
   cursor: pointer;
   line-height: 50px;
-  font-size: 1.8rem;
-}
-input {
-  padding: 0 10px;
-  width: 300px;
-  height: 50px;
   font-size: 1.5rem;
+}
+input, select {
+  padding: 0 10px;
+  width: 250px;
+  height: 40px;
+  font-size: 1.2rem;
   display: inline-block;
   border: 2px solid #cccccc;
   border-radius: 5px;
+  background: #2b2a33;
+  color: white;
 }
 .btn {
-  padding: 10px;
-  font-size: 1.5rem;
+  padding: 8px 10px 8px 10px;
+  font-size: 1.2rem;
   color: white;
   display: inline-block;
-  background: #053056;
-  border: 2px solid white;
+  background: #1d1e24;
+  border: 1px solid gray;
   border-radius: 5px;
   cursor: pointer;
 }
 .btn:hover {
-  background: #264e72;
+  background: black;
+}
+.iblock{
+	display:inline-block;
+}
+.w100{
+	width:100px;
 }
 .text {
   display: block;
   margin: 20px 0;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 .whitefont {
   color: white;
@@ -88,12 +96,14 @@ hr {
   margin-right: auto;
   text-align: left;
 }
+#settings, #transactions { 
+	padding: 0 25px 0 25px; 
+}
 .dot {
   display: inline-flex;
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 1.2rem;
-  margin: 0.4rem 1rem 0 0;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 1rem;
   background-color: #fdc948;
 }
 #invoices {
@@ -113,6 +123,9 @@ th {
   width: 10%;
   text-align: center;
 }
+.column1:first-child{ 
+	border-top-left-radius: 10px; 
+}
 .column2 {
   width: 25%;
 }
@@ -122,6 +135,9 @@ th {
 .column4 {
   width: 50%;
 }
+.column4:first-child{ 
+	border-top-right-radius: 10px; 
+}
 #invoices {
   position: relative;
   max-height: calc(100vh - 300px);
@@ -130,7 +146,7 @@ th {
 }
 #invoices table {
   overflow: hidden;
-  background-color: #333;
+  background-color: black;
   border-radius: 10px;
 }
 #invoices thead {
@@ -143,19 +159,24 @@ th {
   padding-top: 18px;
   padding-bottom: 18px;
   font-family: Arial;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #ffffff;
-  line-height: 1.4;
+  line-height: 1.4rem;
   text-transform: uppercase;
-  background-color: #393939;
+  background-color: #1d1e24;
+  border-bottom: 2px solid black;
 }
 #invoices td {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 10px;
   font-family: Arial;
-  font-size: 1.3rem;
-  line-height: 1.4;
-  background-color: #222222;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+}
+#invoices tr:nth-child(odd) {
+  background-color: #141415;
+}
+#invoices tr:nth-child(even) {
+  background-color: #1d1e24;
 }
 #tx_count {
   font-size: 1rem;
@@ -170,6 +191,7 @@ th {
   border-radius: 5px;
   padding: 5px 10px;
   margin-right: 30px;
+  font-size:1.8rem;
 }
 .login_box {
   position: absolute;
@@ -180,7 +202,7 @@ th {
   max-width: 300px;
   padding: 50px;
   border-radius: 10px;
-  background: #282828;
+  background: #1d1e24;
 }
 
 /* RADIO BUTTONS */
@@ -222,7 +244,7 @@ th {
 
 /* When the radio button is checked, add a blue background */
 .radiolabel input:checked ~ .radiobtn {
-  background-color: #053056;
+  background-color: #1d1e24;
 }
 
 /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -239,10 +261,10 @@ th {
 
 /* Style the indicator (dot/circle) */
 .radiolabel .radiobtn:after {
-  top: 8px;
-  left: 8px;
-  width: 10px;
-  height: 10px;
+  top: 7px;
+  left: 7px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: white;
 }
