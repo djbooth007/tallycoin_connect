@@ -50,11 +50,11 @@ Visit http://localhost:8123/ (replace 'localhost' with your actual hostname)
 
 ## NOTE: Where to Find API Key
 
-Login to https://tallycoin.app and navigate to the Admin Dashboard, then Node Connect.
+Login to https://tallycoin.app and navigate to Settings - My Wallets, then Tallycoin Connect.
 
 Generate an API Key and copy it. Go back to your node and enter the key.
 
-Back on the Tallycoin Node Connect page, test your connection. This may take up to 1 minute for connection to sync.
+Back on the tallycoin.app "Tallycoin Connect External Wallet" page, test your connection. This may take up to 1 minute for connection to sync.
 
 ## How Does Tallycoin Connect work?
 
