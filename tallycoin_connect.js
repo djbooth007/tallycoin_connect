@@ -11,13 +11,19 @@ let ws, wstimer, connected = 'N', users = [], keys = {}
 
 // Utils
 const writeConfig = update => {
-  const config = JSON.stringify(Object.assign(keys, update), null, 2)
-  fs.writeFile(CONFIG_FILE, config, err => {
-    if (err) console.error(err)
-  })
+  if(typeof(keys) === 'object'){
+    const config = JSON.stringify(Object.assign(keys, update), null, 2)
+	  if (config != '' && config !== null){
+	    fs.writeFile(CONFIG_FILE, config, err => {
+	  	  if (err) console.error(err)
+	    })
+	  }else{
+        console.log('tallycoin_api.key has missing parameters')
+	  }
+  }
 }
 
-const passwdHash = text => shajs('sha256').update(text).digest('hex')
+const hash_text = text => shajs('sha256').update(text).digest('hex')
 
 const base64FromFile = file => Buffer.from(fs.readFileSync(file)).toString('base64')
 
@@ -47,7 +53,7 @@ if (LND_MACAROON_PATH) keys.macaroon = base64FromFile(LND_MACAROON_PATH)
 if (!keys.lnd_socket && LND_SOCKET) keys.lnd_socket = LND_SOCKET
 if (!keys.tallycoin_api && TALLYCOIN_APIKEY) keys.tallycoin_api = TALLYCOIN_APIKEY
 if (!keys.tallycoin_passwd && TALLYCOIN_PASSWD) keys.tallycoin_passwd = TALLYCOIN_PASSWD
-if (!keys.tallycoin_passwd && TALLYCOIN_PASSWD_CLEARTEXT) keys.tallycoin_passwd = passwdHash(TALLYCOIN_PASSWD_CLEARTEXT)
+if (!keys.tallycoin_passwd && TALLYCOIN_PASSWD_CLEARTEXT) keys.tallycoin_passwd = hash_text(TALLYCOIN_PASSWD_CLEARTEXT)
 
 writeConfig(keys)
 
@@ -99,7 +105,7 @@ app.post('/sync', jsonParser, (req, res) => {
 
 // Login when password is set
 app.post('/login', jsonParser, (req, res) => {
-  if (passwdHash(req.body.passwd) == keys.tallycoin_passwd) {
+  if (hash_text(req.body.passwd) == keys.tallycoin_passwd) {
     users.push(req.ip)
     res.json({ login_state: 'Y' })
   } else {
@@ -117,7 +123,7 @@ app.post('/save_api', jsonParser, (req, res) => {
 // Save password from setup page
 app.post('/save_passwd', jsonParser, (req, res) => {
   writeConfig({
-    tallycoin_passwd: passwdHash(req.body.passwd)
+    tallycoin_passwd: hash_text(req.body.passwd)
   })
 })
 
@@ -188,7 +194,19 @@ function lightning(type, data) {
 
   // When message 'payment_create' received, get fresh invoice from LND and send response to Tallycoin server
   if (type == 'payment_create') {
-    lnService.createInvoice({ lnd, is_including_private_channels: true, is_fallback_included: true, description: data.description, tokens: data.amount }, (err, invoice) => {
+	  
+    var description = data.description
+    var description_hash = null
+	
+    // Check LNURL payRequest: https://github.com/lnurl/luds/blob/luds/06.md	
+    if( description.includes('[[\"text/plain\"') ){
+      description_hash = hash_text(description)
+      var new_description = JSON.parse(description)
+      description = new_description[0][1]
+    }
+	
+    lnService.createInvoice({ lnd, is_including_private_channels: true, is_fallback_included: true, description: description, description_hash: description_hash, tokens: data.amount}, (err, invoice) => {
+	  
       ws.send(JSON.stringify({
         type: 'payment_data',
         id: invoice['id'],
