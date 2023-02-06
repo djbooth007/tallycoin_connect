@@ -14,18 +14,33 @@ body {
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+  height: 50px;
+}
+.maxwidth{
+  max-width: 1200px;
+  margin-left: auto; 
+  margin-right: auto;	
 }
 .navitem {
-  float: right;
+  display: inline-block;
   cursor: pointer;
   line-height: 50px;
   font-size: 1.5rem;
+}
+.navitem:last-child{ 
+  margin-left: 50px;
+}
+.logo{
+  float: left;
+  text-align: left;	
+}
+.logo img{
+  width: 50%;
 }
 input, select {
   padding: 0 10px;
   width: 250px;
   height: 40px;
-  font-size: 1.2rem;
   display: inline-block;
   border: 2px solid #cccccc;
   border-radius: 5px;
@@ -34,7 +49,6 @@ input, select {
 }
 .btn {
   padding: 8px 10px 8px 10px;
-  font-size: 1.2rem;
   color: white;
   display: inline-block;
   background: #1d1e24;
@@ -46,10 +60,13 @@ input, select {
   background: black;
 }
 .iblock{
-	display:inline-block;
+  display:inline-block;
+}
+.floatright{
+  float: right;
 }
 .w100{
-	width:100px;
+  width:100px;
 }
 .text {
   display: block;
@@ -80,7 +97,6 @@ hr {
   border: 3px solid #bb0000;
   padding: 20px;
   border-radius: 5px;
-  font-size: 1.2rem;
 }
 .saved {
   color: #fdc948;
@@ -120,11 +136,11 @@ th {
   padding-left: 10px;
 }
 .column1 {
-  width: 10%;
+  width: 5%;
   text-align: center;
 }
 .column1:first-child{ 
-	border-top-left-radius: 10px; 
+  border-top-left-radius: 10px; 
 }
 .column2 {
   width: 25%;
@@ -136,7 +152,7 @@ th {
   width: 50%;
 }
 .column4:first-child{ 
-	border-top-right-radius: 10px; 
+  border-top-right-radius: 10px; 
 }
 #invoices {
   position: relative;
@@ -169,7 +185,6 @@ th {
 #invoices td {
   padding: 10px;
   font-family: Arial;
-  font-size: 1.2rem;
   line-height: 1.4rem;
 }
 #invoices tr:nth-child(odd) {
@@ -199,7 +214,7 @@ th {
   top: 50%;
   left: 50%;
   display: block;
-  max-width: 300px;
+  max-width: 356px;
   padding: 50px;
   border-radius: 10px;
   background: #1d1e24;
@@ -212,7 +227,6 @@ th {
   padding: 0 40px;
   margin-bottom: 30px;
   cursor: pointer;
-  font-size: 1.2rem;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -223,6 +237,7 @@ th {
 .radiolabel input {
   position: absolute;
   opacity: 0;
+  width: 0px;
   cursor: pointer;
 }
 
@@ -267,4 +282,58 @@ th {
   height: 11px;
   border-radius: 50%;
   background: white;
+}
+
+@media only screen and (max-device-width : 812px) and (orientation : portrait){
+  body {
+    font-size: 1.8rem;
+  }  
+  .topshelf{
+    height: 40px;
+    margin-bottom: 20px;
+  }
+  .navitem {
+    font-size: 1rem;
+    line-height: 40px;
+  }
+  .navitem:last-child{ 
+    margin-left: 20px;
+  }
+  .logo{
+    width: 100px;
+  }
+  .logo img{
+    width: 100%;
+  }
+  .paid_sats{
+    display: block;
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+  }
+  .smtext {
+    font-size: 1rem;
+    line-height: 1.8rem;
+  }
+  .radiolabel{
+    font-size: 1rem;
+    padding: 35px 20px;
+    margin-bottom: 0;
+  }
+  .radiobtn{
+    left: 20px;
+  }
+  .btn, .text{
+    font-size: 1.2rem;
+  }
+  #tx_count, #invoices th{
+    font-size: 1rem;
+  }
+  #transactions{
+    padding: 0 15px 0 15px;
+  }
+  input, select {
+    height: 40px;
+    width: 200px;
+    font-size: 1rem;	
+  }
 }
