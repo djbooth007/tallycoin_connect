@@ -2,6 +2,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Tallycoin Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link href="assets/connect.css" rel="stylesheet">
   <script src="assets/connect.js"></script>
@@ -22,11 +23,12 @@
 </head>
 <body>
   <div class="topshelf">
-    <div style="max-width:1200px;margin-left: auto; margin-right: auto;">
-      <div style="float:left;text-align:left;"><img src="assets/tallycoin-connect.png" style="width:50%"></div>
-      <div class="navitem" style="margin-left:50px;" onclick="connect.open_page('setup')"><span id="sync">&#9679;</span>
-        Setup</div>
-      <div class="navitem" onclick="connect.open_page('transactions')">Transactions</div>
+    <div class="maxwidth">
+      <div class="logo"><img src="assets/tallycoin-connect.png"></div>
+	  <div class="floatright">
+		  <div class="navitem" onclick="connect.open_page('transactions')">Transactions</div>
+		  <div class="navitem" onclick="connect.open_page('setup')"><span id="sync">&#9679;</span> Setup</div>
+	  </div>
       <div style="clear:both"></div>
     </div>
   </div>
@@ -60,6 +62,7 @@
   </div>
 
   <div id="transactions">
+  
     <div style="text-align:center;">
       <div class="paid_sats"><span id="paid_sats_total"></span> sats</div>
       <label class="radiolabel">All
@@ -82,7 +85,7 @@
       <table>
         <thead>
           <tr>
-            <th class="column1">Status</th>
+            <th class="column1">&nbsp;</th>
             <th class="column2">Date</th>
             <th class="column3">Sats</th>
             <th class="column4">Message</th>
@@ -93,10 +96,13 @@
     </div>
 
     <div id="tx_count">Showing most recent <span id="inv_count"></span> transactions.</div>
+	
   </div>
+  
   <audio id="sfx">
     <source src="assets/incoming_tx.ogg" type="audio/ogg">
     <source src="assets/incoming_tx.mp3" type="audio/mpeg">
   </audio>
+  
 </body>
 </html>
