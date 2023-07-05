@@ -9,7 +9,7 @@
   "dependencies": {
     "body-parser": "1.19.2",
     "express": "4.17.3",
-    "ln-service": "53.23.0",
+    "ln-service": "56.8.0",
     "ws": "8.5.0"
   },
   "scripts": {
