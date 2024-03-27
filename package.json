@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "body-parser": "1.19.2",
-    "express": "4.17.3",
+    "express": "4.19.2",
     "ln-service": "56.8.0",
     "ws": "8.5.0"
   },
