@@ -1,10 +1,12 @@
 # Tallycoin Connect
 
+## NOTE: Tallycoin platform shut down June 1st, 2024. Therefore, Tallycoin Connect service will not function.
+
 ![screenshot](https://tallycoin.app/img/tallycoin_connect_screenshot.jpg)
 
 ## Decentralize the money
 
-Install Tallycoin Connect on a bitcoin node to allow for the retrieval of lightning invoices via [Tallycoin](https://tallycoin.app). 
+Install Tallycoin Connect on a bitcoin node to allow for the retrieval of lightning invoices via Tallycoin. 
 
 Get your own personalized Lightning Address connecting to your own node! eg, ⚡️ username @ tallycoin.app
 
