@@ -10,7 +10,7 @@
     "body-parser": "1.19.2",
     "express": "4.19.2",
     "ln-service": "56.8.0",
-    "ws": "8.5.0"
+    "ws": "8.17.1"
   },
   "scripts": {
     "start": "node tallycoin_connect.js"
